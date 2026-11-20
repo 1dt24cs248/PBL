@@ -2,13 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .database import Base, engine
 from .routers import auth, rooms
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    Base.metadata.create_all(engine)
     yield
 
 

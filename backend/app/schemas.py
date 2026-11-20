@@ -35,6 +35,7 @@ class RoomOut(BaseModel):
     facilities: str
     status: str
     version: int
+    provenance: str
 
 
 class RoomCreate(BaseModel):

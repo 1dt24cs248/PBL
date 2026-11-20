@@ -7,6 +7,8 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base, get_db
 from app.main import app
 from app.seed import DEV_PASSWORD, seed
+from app.models import Building, Room
+from sqlalchemy import select
 
 
 @pytest.fixture()
@@ -20,6 +22,8 @@ def client():
     Session = sessionmaker(bind=engine, autoflush=False)
     with Session() as s:
         seed(s)
+        assert s.query(Room).count() == 66
+        assert {b.code for b in s.scalars(select(Building))} == {"A"}
 
     def override():
         db = Session()
@@ -66,7 +70,8 @@ def test_me(client):
 
 def test_student_can_list_rooms(client):
     r = client.get("/rooms", headers=login(client, "stu1"))
-    assert r.status_code == 200 and len(r.json()) == 12
+    assert r.status_code == 200 and len(r.json()) == 66
+    assert {room["provenance"] for room in r.json()} == {"SYNTHETIC", "INFERRED"}
 
 
 def test_student_cannot_create_room(client):
