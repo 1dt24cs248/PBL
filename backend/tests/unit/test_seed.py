@@ -29,6 +29,8 @@ def test_dataset_parser_and_seed_counts(tmp_path):
                    for row in db.scalars(select(DivisionSectionMap)))
         assert db.query(RoomAlias).count() == len(dataset.aliases)
         assert "A-F2-11" in report and "A-F2-12" in report
+        assert "1DT24CS" not in report and "24UGDT" not in report
+        assert "SHAILENDRA KUMAR N" not in report
         # The seed is safe to rerun and keeps IDs / counts stable.
         seed(db, dataset)
         assert db.query(Room).count() == 66

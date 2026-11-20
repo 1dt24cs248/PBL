@@ -104,6 +104,8 @@ def _parse_students(text: str) -> tuple[list[dict], list[dict], list[str]]:
     sections: list[dict] = []
     issues: list[str] = []
     seen_usns = set()
+    admission_rows = 0
+    addendum_rows = 0
     for match in division_matches:
         division, header, declared, body = match.groups()
         room_match = re.search(r"\((A-[A-Z0-9-]+)", header)
@@ -126,10 +128,12 @@ def _parse_students(text: str) -> tuple[list[dict], list[dict], list[str]]:
             if usn:
                 seen_usns.add(usn)
             else:
-                issues.append(f"{identifier}: admission number is not a USN; student stored with NULL USN and source_identifier preserved.")
+                admission_rows += 1
             students.append({"usn": usn, "source_identifier": None if usn else identifier,
                              "full_name": full_name, "gender": gender, "lab_batch": batch,
                              "section_code": division, "provenance": "REAL_DSATM_PDF"})
+    if admission_rows:
+        issues.append(f"{admission_rows} admission-number roster entries are not official USNs; NULL USN stored and source identifiers retained in the database.")
     # Parse the explicitly named roster addendum without hand-entering student rows.
     addendum = re.search(r"\(Also include (.*?) from the master", roster_text, re.S)
     if addendum:
@@ -142,7 +146,9 @@ def _parse_students(text: str) -> tuple[list[dict], list[dict], list[str]]:
                              "gender": None, "lab_batch": None, "section_code": section_code,
                              "provenance": "REAL_DSATM_PDF"})
             seen_usns.add(usn)
-            issues.append(f"{usn}: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence ({section_code}).")
+            addendum_rows += 1
+    if addendum_rows:
+        issues.append(f"{addendum_rows} explicit master-list addendum records have no gender/batch; those fields remain NULL; divisions are derived from USN sequence.")
     return students, sections, issues
 
 

@@ -60,7 +60,7 @@ Lists one section's sessions. Required query: `term`. Optional filters: `day`, `
 Returns the authenticated student's own roster record and inferred division-to-section mapping. Student role only; other roles receive `403`.
 
 ```json
-{"usn":"1DT24CS248","full_name":"SHAILENDRA KUMAR N","division_code":"CSE-5","section_code":"E","lab_batch":"A1","provenance":"REAL_DSATM_PDF","mapping_data_status":"INFERRED"}
+{"usn":"<redacted>","full_name":"<redacted>","division_code":"CSE-5","section_code":"E","lab_batch":"A1","provenance":"REAL_DSATM_PDF","mapping_data_status":"INFERRED"}
 ```
 
 ### `GET /timetable/student/me`
@@ -68,7 +68,7 @@ Returns the authenticated student's own roster record and inferred division-to-s
 Returns the authenticated student's timetable. Student role only. Division maps to the term section; `A1` selects batch `B1`, `A2` selects batch `B2`, and `ALL` sessions apply to both batches.
 
 ```json
-{"usn":"1DT24CS248","term_code":"2026-27-ODD","division_code":"CSE-5","section_code":"E","lab_batch":"A1","sessions":[{"id":501,"day":"Wed","periods":[1,2],"subject_code":"BCS502","subject_name":"Machine Learning","faculty_initials":"PP","room_id":"A-F2-02","batch":"ALL","room_required":true,"raw_label":"5TH E SECTION; P1-P2 ML (PP)","block_id":"2026-27-ODD-E-WED-P1-P2-1","provenance":"REAL_DSATM_PDF","version":1}]}
+{"usn":"<redacted>","term_code":"2026-27-ODD","division_code":"CSE-5","section_code":"E","lab_batch":"A1","sessions":[{"id":501,"day":"Wed","periods":[1,2],"subject_code":"BCS502","subject_name":"Machine Learning","faculty_initials":"PP","room_id":"A-F2-02","batch":"ALL","room_required":true,"raw_label":"5TH E SECTION; P1-P2 ML (PP)","block_id":"2026-27-ODD-E-WED-P1-P2-1","provenance":"REAL_DSATM_PDF","version":1}]}
 ```
 
 ### `GET /timetable/faculty/{faculty_id}`
@@ -150,3 +150,45 @@ Maps a date to its weekday and returns that date's active-term sessions. On a se
 | `maintenance` | Room data and metadata only; no roster, student timetable, or section timetable | No | No | No | No |
 
 Unauthenticated requests return `401`. Authenticated requests outside the role or ownership rules return `403`. Student names and USNs are exposed only through the authenticated student's own endpoints; maintenance cannot read student roster or student timetables.
+
+## Authentication endpoints
+
+### `POST /auth/login`
+
+Public endpoint. Request fields are `username` and `password`.
+
+```json
+{"username":"fac1","password":"Pass@123"}
+```
+
+Response fields are `access_token`, `token_type`, and `user`. The user object includes `id`, `username`, `full_name`, `role`, `category`, and `department`.
+
+```json
+{"access_token":"<JWT>","token_type":"bearer","user":{"id":4,"username":"fac1","full_name":"Synthetic Faculty 1","role":"teaching_faculty","category":"Faculty","department":"CSE"}}
+```
+
+Invalid credentials return `401` with `{"detail":"Invalid username or password"}`.
+
+### `GET /auth/me`
+
+Requires a bearer JWT. Returns the authenticated user object with `id`, `username`, `full_name`, `role`, `category`, and `department`.
+
+```json
+{"id":4,"username":"fac1","full_name":"Synthetic Faculty 1","role":"teaching_faculty","category":"Faculty","department":"CSE"}
+```
+
+## Error response shapes
+
+Errors use FastAPI's `{"detail": ...}` envelope. Examples reflect the current backend:
+
+```text
+401: {"detail":"Not authenticated"}
+403: {"detail":"Insufficient permissions"}
+404: {"detail":"Room not found"}
+409: {"detail":{"detail":"session clashes","conflict":{"type":"room","term_code":"2026-27-ODD","day":"Wed","period":1,"session_ids":[501,502]}}}
+422: {"detail":[{"type":"missing","loc":["body","username"],"msg":"Field required","input":{}}]}
+```
+
+Each numeric prefix labels the HTTP status; the JSON after it is the actual response body. A version conflict uses `{"detail":{"detail":"version conflict","version":1}}`.
+
+Roles are returned in the `role` field: `student`, `teaching_faculty`, `hod`, `admin`, or `maintenance`. Categories are returned in `category`: `Student`, `Faculty`, or `Management` (`hod` is categorized as `Faculty`).

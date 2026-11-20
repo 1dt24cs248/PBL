@@ -16,11 +16,8 @@ Counts after idempotent seed (A-Block only):
 - A-F2-11: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).
 - A-F2-12: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).
 - A-409: alias is documented against the A-F4-06–10 range; resolved to A-F4-09 from its room number and the floor/room numbering rule.
-- 24UGDT1805-CS1: admission number is not a USN; student stored with NULL USN and source_identifier preserved.
-- 24UGDT0186-CS1: admission number is not a USN; student stored with NULL USN and source_identifier preserved.
-- 1DT24CS198: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence (CSE-4).
-- 1DT24CS239: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence (CSE-5).
-- 1DT24CS272: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence (CSE-5).
+- 2 admission-number roster entries are not official USNs; NULL USN stored and source identifiers retained in the database.
+- 3 explicit master-list addendum records have no gender/batch; those fields remain NULL; divisions are derived from USN sequence.
 - CSE division to 5th-semester section mapping is the requested inferred admin-editable mapping: CSE-1->A, CSE-2->B, CSE-3->C, CSE-4->D, CSE-5->E, CSE-6->F.
 - CSE-4: roster parser finds 59 assigned student rows but heading declares 58; source memberships preserved without reallocation.
 - CSE-5: roster parser finds 60 assigned student rows but heading declares 58; source memberships preserved without reallocation.
@@ -35,15 +32,15 @@ M1 roster, room and energy seed report. M2 timetable import results are appended
 ## M2 Timetable Import Report
 
 Counts are parsed from the three timetable datasets; no clash was automatically corrected.
-- Sessions per term: 2024-25-EVEN: 115, 2025-26-ODD: 177, 2026-27-ODD: 171
-- Sessions per section: 2024-25-EVEN CS-DS: 25, 2024-25-EVEN CS-ICB: 23, 2024-25-EVEN CSE-2: 23, 2024-25-EVEN CSE-4: 21, 2024-25-EVEN CSE-5: 23, 2025-26-ODD A: 28, 2025-26-ODD B: 29, 2025-26-ODD C: 31, 2025-26-ODD D: 29, 2025-26-ODD E: 31, 2025-26-ODD F: 29, 2026-27-ODD A: 28, 2026-27-ODD B: 28, 2026-27-ODD C: 28, 2026-27-ODD D: 29, 2026-27-ODD E: 29, 2026-27-ODD F: 29
-- Distinct rooms used by inferred room assignments: 17
-- Sessions with an INFERRED room assignment: 317
+- Sessions per term: 2024-25-EVEN: 115, 2025-26-ODD: 183, 2026-27-ODD: 177
+- Sessions per section: 2024-25-EVEN CS-DS: 25, 2024-25-EVEN CS-ICB: 23, 2024-25-EVEN CSE-2: 23, 2024-25-EVEN CSE-4: 21, 2024-25-EVEN CSE-5: 23, 2025-26-ODD A: 29, 2025-26-ODD B: 30, 2025-26-ODD C: 32, 2025-26-ODD D: 30, 2025-26-ODD E: 32, 2025-26-ODD F: 30, 2026-27-ODD A: 29, 2026-27-ODD B: 29, 2026-27-ODD C: 29, 2026-27-ODD D: 30, 2026-27-ODD E: 30, 2026-27-ODD F: 30
+- Distinct rooms used by inferred room assignments: 16
+- Sessions with an INFERRED room assignment: 323
 - Sessions with room_required=False: 58
 - Excluded B-Block lab entries: 10
-- Conflicts per type: room: 41, faculty: 26, section: 0
-- Conflicts per term/type: 2024-25-EVEN faculty: 2, 2025-26-ODD faculty: 16, 2025-26-ODD room: 30, 2026-27-ODD faculty: 8, 2026-27-ODD room: 11
-- Room conflicts involving at least one inferred room assignment: 35 (these are provisional pending room confirmation).
+- Conflicts per type: room: 62, faculty: 26, section: 0
+- Conflicts per term/type: 2024-25-EVEN faculty: 2, 2025-26-ODD faculty: 16, 2025-26-ODD room: 50, 2026-27-ODD faculty: 8, 2026-27-ODD room: 12
+- Room conflicts involving at least one inferred room assignment: 55 (these are provisional pending room confirmation).
 
 ### Detected source clashes
 - 2026-27-ODD faculty clash on Mon P6: section A `Mon P5-P6 ML LAB (SK, RKP, RS) @ 305 A` and section D `Mon P6 TOC (RKP)`.
@@ -61,6 +58,7 @@ Counts are parsed from the three timetable datasets; no clash was automatically 
 - 2026-27-ODD room clash on Thu P1: section C `Thu P1-P2 CG LAB / NEXT GEN LAB (B2: AB, SD @ 210 A / B1: RM, LM @ 206 A)` and section F `Thu P1 ML @ A 211`.
 - 2026-27-ODD room clash on Thu P2: section C `Thu P1-P2 CG LAB / NEXT GEN LAB (B2: AB, SD @ 210 A / B1: RM, LM @ 206 A)` and section F `Thu P2 CNS @ A 211`.
 - 2026-27-ODD faculty clash on Thu P4: section D `Thu P4 CNS (UCR)` and section E `Thu P4 CNS @ A 202`.
+- 2026-27-ODD room clash on Thu P6: section D `Thu P6-P7 CG LAB / NEXT GEN LAB (B2: MN, RM @ 210 A / B1: RS, KM @ 206 A)` and section E `Thu P5-P6 CG LAB / NEXT GEN LAB (B2: MS, AL @ 210 A / B1: MA, KSL @ 206 A)`.
 - 2026-27-ODD room clash on Thu P6: section D `Thu P6-P7 CG LAB / NEXT GEN LAB (B2: MN, RM @ 210 A / B1: RS, KM @ 206 A)` and section E `Thu P5-P6 CG LAB / NEXT GEN LAB (B2: MS, AL @ 210 A / B1: MA, KSL @ 206 A)`.
 - 2026-27-ODD faculty clash on Fri P1: section A `Fri P1-P2 CG LAB / NEXT GEN LAB (B2: SD, KM @ 210 A / B1: KSL, MA @ 206 A)` and section F `Fri P1 FCG @ A 203`.
 - 2026-27-ODD faculty clash on Sat P1: section A `Sat P1-P2 PBL-MAD (KDK)` and section B `Sat P1-P2 PBL-MAD (KDK)`.
@@ -85,17 +83,37 @@ Counts are parsed from the three timetable datasets; no clash was automatically 
 - 2025-26-ODD room clash on Wed P1: section E `Wed P1 DDCO (SJK)` and section F `Wed P1 OS @ 402`. [inferred room assignment involved]
 - 2025-26-ODD room clash on Wed P2: section E `Wed P2 MAT (GA)` and section F `Wed P2 EDC @ 402`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Thu P6: section E `Thu P6 DDCO (SJK)` and section F `Thu P5-P6 DDCO/PYT (B2: MR,SJK / B1: YG)`.
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)`.
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)`.
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`.
+- 2025-26-ODD room clash on Fri P6: section A `Fri P6-P7 DDCO/PYT (B2: BV,AV / B1: KS,SA)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`.
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`.
+- 2025-26-ODD room clash on Fri P6: section B `Fri P6-P7 DDCO/PYT (B2: BV,SB / B1: DB,UKC)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
 - 2025-26-ODD room clash on Fri P1: section C `Fri P1 DDCO (SJK)` and section F `Fri P1 OS @ 103`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P2: section C `Fri P2 EDC (SA)` and section D `Fri P2 EDC (SA)`.
 - 2025-26-ODD room clash on Fri P2: section C `Fri P2 EDC (SA)` and section F `Fri P2 MAT @ 103`. [inferred room assignment involved]
-- 2025-26-ODD faculty clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`.
+- 2025-26-ODD room clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`.
+- 2025-26-ODD room clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`. [inferred room assignment involved]
+- 2025-26-ODD faculty clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)`.
+- 2025-26-ODD room clash on Fri P6: section C `Fri P6-P7 DDCO/PYT (B2: SJK,MA / B1: KS,VI)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
+- 2025-26-ODD room clash on Fri P5: section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
 - 2025-26-ODD faculty clash on Fri P5: section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`.
+- 2025-26-ODD room clash on Fri P5: section D `Fri P5-P6 DDCO/PYT (B2: MR,DB / B1: VI,SA)` and section E `Fri P5-P6 DDCO/PYT (B2: SJK,DB / B1: SM)`. [inferred room assignment involved]
 - 2025-26-ODD room clash on Sat P1: section A `Sat P1-P2 JAVA LAB` and section B `Sat P1-P2 JAVA LAB`. [inferred room assignment involved]
 - 2025-26-ODD room clash on Sat P1: section A `Sat P1-P2 JAVA LAB` and section C `Sat P1-P2 JAVA LAB`. [inferred room assignment involved]
 - 2025-26-ODD room clash on Sat P1: section A `Sat P1-P2 JAVA LAB` and section D `Sat P1-P2 JAVA LAB`. [inferred room assignment involved]
