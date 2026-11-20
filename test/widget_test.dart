@@ -1,21 +1,78 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:pbl/main.dart';
+import 'package:pbl/features/authentication/authentication_screen.dart';
+
+class FakeAuthNotifier extends AuthNotifier {
+  FakeAuthNotifier(this.user);
+
+  final AppUser? user;
+
+  @override
+  Future<AppUser?> build() async => user;
+}
 
 void main() {
-  testWidgets('PBL home shows the app title and health check', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(PblApp(healthCheck: () async => 'ok'));
+  testWidgets('login form validates username and password', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authProvider.overrideWith(() => FakeAuthNotifier(null))],
+        child: const MaterialApp(home: AuthenticationScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Login'));
     await tester.pump();
 
-    expect(find.text('PBL Campus'), findsOneWidget);
-    expect(find.text('Backend status: ok'), findsOneWidget);
+    expect(find.text('Enter your username or USN'), findsOneWidget);
+    expect(find.text('Enter your password'), findsOneWidget);
+  });
+
+  final roleCases = <String, String>{
+    'student': 'Student Dashboard',
+    'teaching_faculty': 'Faculty Dashboard',
+    'hod': 'HOD Dashboard',
+    'admin': 'Management Dashboard',
+    'maintenance': 'Management Dashboard',
+  };
+
+  for (final entry in roleCases.entries) {
+    testWidgets('${entry.key} role redirects to ${entry.value}', (
+      tester,
+    ) async {
+      final user = AppUser(
+        id: 1,
+        username: 'test-user',
+        fullName: 'Test User',
+        role: entry.key,
+        category: entry.key == 'student' ? 'Student' : 'Faculty',
+        department: 'CSE',
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [authProvider.overrideWith(() => FakeAuthNotifier(user))],
+          child: const PblApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(entry.value), findsWidgets);
+    });
+  }
+
+  testWidgets('unauthenticated users redirect to login', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authProvider.overrideWith(() => FakeAuthNotifier(null))],
+        child: const PblApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign in'), findsOneWidget);
   });
 }
