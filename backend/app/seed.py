@@ -11,7 +11,7 @@ from .database import SessionLocal
 from .config import settings
 from .dataset import Dataset, parse_dataset
 from .models import (Building, DivisionSectionMap, EnergyBaseline, Equipment, Holiday,
-                     Room, RoomAlias, Section, Student, User)
+                     NavEdge, NavNode, Room, RoomAlias, Section, Student, User)
 from .security import hash_password
 
 DEV_PASSWORD = "Pass@123"  # synthetic dev password only
@@ -122,6 +122,7 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
         holiday_date = date.fromisoformat(row["holiday_date"])
         if db.scalar(select(Holiday).where(Holiday.holiday_date == holiday_date)) is None:
             db.add(Holiday(holiday_date=holiday_date, name=row["name"], provenance=row["provenance"]))
+    _seed_floorplan(db, room_rows)
     db.commit()
     report = _count_report(db, data)
     (Path(__file__).resolve().parents[2] / "docs" / "DATA_ISSUES.md").write_text(report, encoding="utf-8")
@@ -129,6 +130,50 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
     from .timetable_import import import_timetables
     import_timetables(db)
     return report
+
+
+def _seed_floorplan(db: Session, room_rows: dict[str, Room]) -> None:
+    """Keep a new empty database aligned with the JSON-backed Alembic seed."""
+    import json
+
+    artifact_path = Path(__file__).resolve().parents[1] / "data" / "synthetic" / "floorplan.json"
+    artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
+    node_rows: dict[str, NavNode] = {}
+    for floor in artifact["floors"]:
+        for row in floor["rooms"]:
+            room = room_rows[row["room_id"]]
+            geometry = row["geometry"]
+            room.x, room.y, room.w, room.h = geometry["x"], geometry["y"], geometry["w"], geometry["h"]
+        for row in floor["nodes"]:
+            node = db.scalar(select(NavNode).where(NavNode.node_key == row["node_key"]))
+            if node is None:
+                node = NavNode(**{key: row[key] for key in (
+                    "node_key", "floor", "node_type", "x", "y", "room_id", "provenance"
+                )})
+                db.add(node)
+            else:
+                for name in ("floor", "node_type", "x", "y", "room_id", "provenance"):
+                    setattr(node, name, row[name])
+            node_rows[row["node_key"]] = node
+    db.flush()
+    for row in artifact["edges"]:
+        from_node, to_node = node_rows[row["from"]], node_rows[row["to"]]
+        edge = db.scalar(select(NavEdge).where(
+            NavEdge.from_node_id == from_node.id,
+            NavEdge.to_node_id == to_node.id,
+            NavEdge.mode == row["mode"],
+        ))
+        values = {
+            "distance_m": row["distance_m"], "floor_delta": row["floor_delta"],
+            "wait_seconds": row["wait_seconds"], "bidirectional": row["bidirectional"],
+            "provenance": row["provenance"],
+        }
+        if edge is None:
+            db.add(NavEdge(from_node_id=from_node.id, to_node_id=to_node.id,
+                           mode=row["mode"], **values))
+        else:
+            for name, value in values.items():
+                setattr(edge, name, value)
 
 
 def _count_report(db: Session, data: Dataset) -> str:
