@@ -39,9 +39,10 @@ def parse_dataset(path: Path = SPEC_PATH) -> Dataset:
         inferred.append(f"{room_id}: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).")
     aliases = _parse_aliases(text)
     if any(provenance == "INFERRED" for _, _, provenance in aliases):
-        inferred.append("A-409: alias is documented against the A-F4-06–10 range; assigned to A-F4-06 as the first room in that range.")
+        inferred.append("A-409: alias is documented against the A-F4-06–10 range; resolved to A-F4-09 from its room number and the floor/room numbering rule.")
     students, sections, roster_issues = _parse_students(text)
     inferred.extend(roster_issues)
+    inferred.append("CSE division to 5th-semester section mapping is the requested inferred admin-editable mapping: " + ", ".join(f"CSE-{n}->{chr(64+n)}" for n in range(1, 7)) + ".")
     division_totals = {section["code"]: sum(s["section_code"] == section["code"] for s in students)
                        for section in sections}
     for section in sections:
@@ -141,7 +142,7 @@ def _parse_students(text: str) -> tuple[list[dict], list[dict], list[str]]:
                              "gender": None, "lab_batch": None, "section_code": section_code,
                              "provenance": "REAL_DSATM_PDF"})
             seen_usns.add(usn)
-            issues.append(f"{usn} {name.strip()}: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence ({section_code}).")
+            issues.append(f"{usn}: explicit master-list addendum has no gender/batch; those fields remain NULL; division derived from USN sequence ({section_code}).")
     return students, sections, issues
 
 
@@ -159,10 +160,39 @@ def _parse_aliases(text: str) -> list[tuple[str, str, str]]:
         if not canonical or not names:
             continue
         base_label = canonical_text.split("(alias")[0].strip()
-        provenance = "INFERRED" if re.search(r"A-F\d-\d+[–-]\d+", base_label) else "REAL_DSATM_PDF"
-        aliases.extend((canonical.group(1), alias.strip(), provenance)
-                       for alias in names.group(1).split("/"))
-    return aliases
+        room_range = re.search(r"A-F(\d)-(\d+)[–-](\d+)", base_label)
+        provenance = "INFERRED" if room_range else "REAL_DSATM_PDF"
+        for alias in names.group(1).split("/"):
+            alias = alias.strip()
+            room_id = canonical.group(1)
+            if room_range:
+                digits = re.search(r"(\d{3})$", alias)
+                floor, first, last = map(int, room_range.groups())
+                if digits:
+                    alias_floor, room_number = divmod(int(digits.group(1)), 100)
+                    if alias_floor == floor and first <= room_number <= last:
+                        room_id = f"A-F{floor}-{room_number:02d}"
+            aliases.append((room_id, alias, provenance))
+    # Plain three-digit classroom labels: floor hundreds + room suffix.
+    for floor in range(1, 6):
+        max_number = 10 if floor < 5 else 4
+        for room_number in range(1, max_number + 1):
+            token = str(floor * 100 + room_number)
+            aliases.append((f"A-F{floor}-{room_number:02d}", token, "REAL_DSATM_PDF"))
+    # Explicit room aliases override the plain numeric pattern where the
+    # dataset maps 209/211 to the canonical shared room A-F2-10.
+    aliases.extend([
+        ("A-G03", "SH1", "REAL_DSATM_PDF"), ("A-G10", "SH-2", "REAL_DSATM_PDF"),
+        ("A-F2-06", "206", "REAL_DSATM_PDF"), ("A-F2-10", "210", "REAL_DSATM_PDF"),
+        ("A-F3-05", "305", "REAL_DSATM_PDF"), ("A-F5-06", "506", "REAL_DSATM_PDF"),
+        ("A-F5-02", "502", "REAL_DSATM_PDF"), ("A-F5-05", "505", "REAL_DSATM_PDF"),
+        ("A-F4-09", "409", "INFERRED"), ("A-F2-05", "205", "REAL_DSATM_PDF"),
+        ("A-F2-10", "209", "REAL_DSATM_PDF"), ("A-F2-10", "211", "REAL_DSATM_PDF"),
+    ])
+    by_alias = {}
+    for room_id, alias, provenance in aliases:
+        by_alias[alias] = (room_id, alias, provenance)
+    return list(by_alias.values())
 
 
 def _equipment_for(room_id: str) -> list[dict]:

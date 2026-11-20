@@ -49,3 +49,31 @@ class RoomCreate(BaseModel):
 
 class RoomStatusUpdate(BaseModel):
     status: str
+
+
+class TimetableSessionCreate(BaseModel):
+    term_code: str
+    section_code: str
+    batch: str = "ALL"
+    day: str
+    periods: list[int]
+    subject_code: str
+    faculty_id: int | None = None
+    room_id: str | None = None
+    room_required: bool = True
+    raw_label: str
+    block_id: str | None = None
+
+
+class TimetableSessionPatch(BaseModel):
+    expected_version: int
+    section_code: str | None = None
+    batch: str | None = None
+    day: str | None = None
+    periods: list[int] | None = None
+    subject_code: str | None = None
+    faculty_id: int | None = None
+    room_id: str | None = None
+    room_required: bool | None = None
+    raw_label: str | None = None
+    block_id: str | None = None

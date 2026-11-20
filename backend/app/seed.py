@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .database import SessionLocal
+from .config import settings
 from .dataset import Dataset, parse_dataset
 from .models import (Building, DivisionSectionMap, EnergyBaseline, Equipment, Holiday,
                      Room, RoomAlias, Section, Student, User)
@@ -55,8 +56,12 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
         db.flush()
         room_rows[row["room_id"]] = room
     for room_id, alias, provenance in data.aliases:
-        if db.scalar(select(RoomAlias).where(RoomAlias.alias == alias)) is None:
+        alias_row = db.scalar(select(RoomAlias).where(RoomAlias.alias == alias))
+        if alias_row is None:
             db.add(RoomAlias(room_id=room_rows[room_id].id, alias=alias, provenance=provenance))
+        else:
+            alias_row.room_id = room_rows[room_id].id
+            alias_row.provenance = provenance
     for idx, row in enumerate(data.equipment, 1):
         code = f"EQ{idx:04d}"
         if db.scalar(select(Equipment).where(Equipment.equipment_code == code)) is None:
@@ -88,13 +93,31 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
         if student is None:
             student = Student(usn=row["usn"], source_identifier=row["source_identifier"],
                               full_name=row["full_name"], gender=row["gender"], lab_batch=row["lab_batch"],
+                              division_code=row["section_code"],
                               provenance=row["provenance"])
             db.add(student)
             db.flush()
-        if db.scalar(select(DivisionSectionMap).where(DivisionSectionMap.student_id == student.id,
-                                                       DivisionSectionMap.section_id == section_rows[row["section_code"]].id)) is None:
-            db.add(DivisionSectionMap(student_id=student.id, section_id=section_rows[row["section_code"]].id,
-                                      provenance=row["provenance"]))
+        student.division_code = row["section_code"]
+    for number in range(1, 7):
+        division = f"CSE-{number}"
+        mapping = db.scalar(select(DivisionSectionMap).where(DivisionSectionMap.division_code == division))
+        if mapping is None:
+            mapping = DivisionSectionMap(division_code=division, section_letter=chr(ord("A") + number - 1),
+                                         data_status="INFERRED", admin_editable=True, provenance="INFERRED")
+            db.add(mapping)
+        else:
+            mapping.section_letter = chr(ord("A") + number - 1)
+            mapping.data_status = "INFERRED"
+            mapping.admin_editable = True
+            mapping.provenance = "INFERRED"
+    students_by_usn = {student.usn: student for student in db.scalars(select(Student).where(Student.usn.is_not(None)))}
+    for usn in (value.strip() for value in settings.demo_student_usns.split(",") if value.strip()):
+        student = students_by_usn.get(usn)
+        if student is None:
+            raise ValueError(f"Configured demo student USN is absent from dataset: {usn}")
+        if db.scalar(select(User).where(User.username == usn)) is None:
+            db.add(User(username=usn, full_name=student.full_name, role="student", department="CSE",
+                        password_hash=hash_password(DEV_PASSWORD), provenance="SYNTHETIC"))
     for row in data.holidays:
         holiday_date = date.fromisoformat(row["holiday_date"])
         if db.scalar(select(Holiday).where(Holiday.holiday_date == holiday_date)) is None:
@@ -103,15 +126,16 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
     report = _count_report(db, data)
     (Path(__file__).resolve().parents[2] / "docs" / "DATA_ISSUES.md").write_text(report, encoding="utf-8")
     print(report)
+    from .timetable_import import import_timetables
+    import_timetables(db)
     return report
 
 
 def _count_report(db: Session, data: Dataset) -> str:
     students = list(db.scalars(select(Student)))
     division_counts = dict(db.execute(
-        select(Section.code, func.count(DivisionSectionMap.id))
-        .join(DivisionSectionMap, DivisionSectionMap.section_id == Section.id)
-        .group_by(Section.code)
+        select(Student.division_code, func.count(Student.id))
+        .group_by(Student.division_code)
     ).all())
     usns = sum(student.usn is not None for student in students)
     no_usn = sum(student.usn is None for student in students)
@@ -136,7 +160,7 @@ def _count_report(db: Session, data: Dataset) -> str:
         "## Provenance",
         "Student roster and division assignments are REAL_DSATM_PDF. Room infrastructure, equipment and energy calculations are SYNTHETIC per the spec. Additional room fields, missing source attributes, and the Deepavali entry supplied by M1 are tagged INFERRED.",
         "",
-        "No timetable sessions were seeded (M2 scope).",
+        "M1 roster, room and energy seed report. M2 timetable import results are appended below.",
         "",
     ])
 
