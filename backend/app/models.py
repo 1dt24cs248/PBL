@@ -101,8 +101,8 @@ class Student(Base):
     full_name: Mapped[str] = mapped_column(String(160))
     gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
     lab_batch: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    division_code: Mapped[str] = mapped_column(String(10), default="", index=True)
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
-    division_links: Mapped[list["DivisionSectionMap"]] = relationship(back_populates="student", cascade="all, delete-orphan")
 
 
 class Section(Base):
@@ -117,12 +117,12 @@ class Section(Base):
 
 class DivisionSectionMap(Base):
     __tablename__ = "division_section_map"
-    __table_args__ = (UniqueConstraint("student_id", "section_id"),)
     id: Mapped[int] = mapped_column(primary_key=True)
-    student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), index=True)
-    section_id: Mapped[int] = mapped_column(ForeignKey("sections.id", ondelete="CASCADE"), index=True)
-    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
-    student: Mapped[Student] = relationship(back_populates="division_links")
+    division_code: Mapped[str] = mapped_column(String(10), unique=True)
+    section_letter: Mapped[str] = mapped_column(String(5))
+    data_status: Mapped[str] = mapped_column(String(20), default="INFERRED")
+    admin_editable: Mapped[bool] = mapped_column(Boolean, default=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="INFERRED")
 
 
 class Holiday(Base):
@@ -130,4 +130,74 @@ class Holiday(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     holiday_date: Mapped[object] = mapped_column(Date, unique=True)
     name: Mapped[str] = mapped_column(String(100))
+    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class AcademicTerm(Base):
+    __tablename__ = "academic_terms"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(30), unique=True)
+    academic_year: Mapped[str] = mapped_column(String(20))
+    semester: Mapped[int] = mapped_column(Integer)
+    term_kind: Mapped[str] = mapped_column(String(10))
+    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class TimetableSubject(Base):
+    __tablename__ = "timetable_subjects"
+    __table_args__ = (UniqueConstraint("term_id", "code"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    term_id: Mapped[int] = mapped_column(ForeignKey("academic_terms.id", ondelete="CASCADE"), index=True)
+    code: Mapped[str] = mapped_column(String(40))
+    name: Mapped[str] = mapped_column(String(160))
+    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class Faculty(Base):
+    __tablename__ = "faculty"
+    __table_args__ = (UniqueConstraint("term_id", "initials"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    term_id: Mapped[int] = mapped_column(ForeignKey("academic_terms.id", ondelete="CASCADE"), index=True)
+    initials: Mapped[str] = mapped_column(String(20))
+    full_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="INFERRED")
+
+
+class TimetableSection(Base):
+    __tablename__ = "timetable_sections"
+    __table_args__ = (UniqueConstraint("term_id", "code"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    term_id: Mapped[int] = mapped_column(ForeignKey("academic_terms.id", ondelete="CASCADE"), index=True)
+    code: Mapped[str] = mapped_column(String(30))
+    name: Mapped[str] = mapped_column(String(100))
+    division_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    home_room_id: Mapped[int | None] = mapped_column(ForeignKey("rooms.id"), nullable=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class TimetableSession(Base):
+    __tablename__ = "timetable_sessions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    term_id: Mapped[int] = mapped_column(ForeignKey("academic_terms.id", ondelete="CASCADE"), index=True)
+    section_id: Mapped[int] = mapped_column(ForeignKey("timetable_sections.id", ondelete="CASCADE"), index=True)
+    batch: Mapped[str] = mapped_column(String(5), default="ALL")
+    day: Mapped[str] = mapped_column(String(3))
+    start_period: Mapped[int] = mapped_column(Integer)
+    end_period: Mapped[int] = mapped_column(Integer)
+    subject_id: Mapped[int | None] = mapped_column(ForeignKey("timetable_subjects.id"), nullable=True)
+    faculty_id: Mapped[int | None] = mapped_column(ForeignKey("faculty.id"), nullable=True, index=True)
+    room_id: Mapped[int | None] = mapped_column(ForeignKey("rooms.id"), nullable=True, index=True)
+    room_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    raw_label: Mapped[str] = mapped_column(String(500))
+    block_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+
+
+class TimetableSessionFaculty(Base):
+    __tablename__ = "timetable_session_faculty"
+    __table_args__ = (UniqueConstraint("session_id", "faculty_id"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("timetable_sessions.id", ondelete="CASCADE"), index=True)
+    faculty_id: Mapped[int] = mapped_column(ForeignKey("faculty.id", ondelete="CASCADE"), index=True)
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")

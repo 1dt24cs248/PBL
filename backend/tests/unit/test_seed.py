@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 from app.database import Base
@@ -11,7 +11,7 @@ def test_dataset_parser_and_seed_counts(tmp_path):
     dataset = parse_dataset()
     assert len(dataset.rooms) == 66
     assert len(dataset.equipment) == 129
-    assert len(dataset.aliases) == 5
+    assert len(dataset.aliases) >= 50
     assert {room["building_id"] for room in dataset.rooms} == {"A"}
     engine = create_engine(f"sqlite:///{tmp_path / 'seed.db'}")
     Base.metadata.create_all(engine)
@@ -21,14 +21,19 @@ def test_dataset_parser_and_seed_counts(tmp_path):
         assert db.query(Student).filter(Student.usn.is_not(None)).count() == 342
         assert db.query(Student).filter(Student.usn.is_(None)).count() == 2
         assert db.query(Section).count() == 6
-        assert db.query(DivisionSectionMap).count() == 344
-        assert db.query(RoomAlias).count() == 5
+        assert db.query(DivisionSectionMap).count() == 6
+        assert {row.division_code: row.section_letter for row in db.scalars(select(DivisionSectionMap))} == {
+            f"CSE-{number}": chr(ord("A") + number - 1) for number in range(1, 7)
+        }
+        assert all(row.data_status == "INFERRED" and row.admin_editable
+                   for row in db.scalars(select(DivisionSectionMap)))
+        assert db.query(RoomAlias).count() == len(dataset.aliases)
         assert "A-F2-11" in report and "A-F2-12" in report
         # The seed is safe to rerun and keeps IDs / counts stable.
         seed(db, dataset)
         assert db.query(Room).count() == 66
         assert db.query(Student).count() == 344
-        assert db.query(DivisionSectionMap).count() == 344
+        assert db.query(DivisionSectionMap).count() == 6
 
 
 def test_roster_addendum_and_admission_numbers_are_not_usns():
