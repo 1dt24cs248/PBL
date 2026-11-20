@@ -192,3 +192,51 @@ Errors use FastAPI's `{"detail": ...}` envelope. Examples reflect the current ba
 Each numeric prefix labels the HTTP status; the JSON after it is the actual response body. A version conflict uses `{"detail":{"detail":"version conflict","version":1}}`.
 
 Roles are returned in the `role` field: `student`, `teaching_faculty`, `hod`, `admin`, or `maintenance`. Categories are returned in `category`: `Student`, `Faculty`, or `Management` (`hod` is categorized as `Faculty`).
+
+## Floorplan and navigation endpoints (M3)
+
+Floorplan geometry and navigation graph data are deterministic synthetic layout data with `provenance: "SYNTHETIC"`. Floors are `-1, 0, 1, 2, 3, 4, 5`, with a `1000 × 600` canvas, a central corridor at `y=270..330`, and rooms in two rows. Room colors use the section 7 palette: classroom `#93C5FD`, computer/hardware lab `#D8B4FE`, seminar/workshop `#86EFAC`, office `#FED7AA`, and utility/circulation `#CBD5E1` or `#E2E8F0`.
+
+All endpoints in this section allow any authenticated role, including maintenance. Unauthenticated requests return `401`.
+
+### `GET /floorplan`
+
+Lists the available floors and canvas metadata.
+
+```json
+{"provenance":"SYNTHETIC","canvas":{"width":1000,"height":600,"metres_per_pixel":0.06},"floors":[{"floor":-1,"label":"Basement","room_count":4},{"floor":0,"label":"Ground Floor","room_count":10},{"floor":1,"label":"First Floor","room_count":10},{"floor":2,"label":"Second Floor","room_count":12},{"floor":3,"label":"Third Floor","room_count":10},{"floor":4,"label":"Fourth Floor","room_count":10},{"floor":5,"label":"Fifth Floor","room_count":10}]}
+```
+
+### `GET /floorplan/{floor}?day={day}&period={period}&date={YYYY-MM-DD}`
+
+Returns the requested floor's room geometry, color, room `status`, `capacity_effective`, `data_status`, and occupancy. The `day` and `period` filters must be supplied together; alternatively, supply `date` with `period` to derive the weekday. With no time filter, occupancy is `null`. Occupancy is read from the active term's `timetable_sessions`. `capacity_effective` is the room capacity unless its status is `under_maintenance` or `temporarily_unavailable`, when it is zero. On the seeded Deepavali holiday, the response contains the holiday name and all rooms have no occupancy.
+
+```json
+{"floor":1,"label":"First Floor","canvas":{"width":1000,"height":600},"date":null,"weekday":"Wed","holiday":null,"rooms":[{"room_id":"A-F1-01","geometry":{"x":60,"y":40,"w":160,"h":210},"color":"#93C5FD","status":"available","capacity_effective":60,"data_status":"SYNTHETIC","occupancy":{"occupied":true,"sessions":[{"section_code":"E","batch":"ALL","periods":[1],"subject_code":"BCS502","raw_label":"Wed P1 ML @ A 101"}]}}]}
+```
+
+Holiday response example:
+
+```json
+{"floor":2,"label":"Second Floor","canvas":{"width":1000,"height":600},"date":"2026-11-10","weekday":"Tue","holiday":"Deepavali 2026","rooms":[{"room_id":"A-F2-02","geometry":{"x":60,"y":40,"w":130,"h":210},"color":"#93C5FD","status":"available","capacity_effective":60,"data_status":"SYNTHETIC","occupancy":{"occupied":false,"sessions":[]}}]}
+```
+
+Unknown floor IDs return `404`.
+
+### `GET /nav/route?from={room}&to={room}&mode={stairs|lift|accessible}`
+
+Finds a shortest route on the seeded corridor graph with Dijkstra's algorithm. `from` and `to` accept canonical room IDs or room aliases supported by `resolve_room`. Routes connect each room's door node to the corridor graph and never traverse room interiors. `stairs` permits stair-core links; `lift` and `accessible` permit lift-core links only. A same-room request returns a zero-weight route. Unknown rooms return `404`; an unsupported or missing mode returns `422`.
+
+Edge `weight` and `route_cost_seconds` are modeled travel seconds. Horizontal edge distance uses 1000 px = 60 m and configured walking speed. Stairs model 12 m per floor. Lift edges model 8 m per floor plus a 20 second wait. `distance_m` is the sum of modeled distances, while waits contribute to cost but not distance. The returned route cost equals the sum of returned edge weights.
+
+```json
+{"from_room":"A-F1-01","to_room":"A-F1-02","mode":"stairs","node_keys":["f1_door_A-F1-01","f1_corridor_n1","f1_corridor_n2","f1_door_A-F1-02"],"edges":[{"from":"f1_door_A-F1-01","to":"f1_corridor_n1","mode":"corridor","distance_m":3,"wait_seconds":0,"weight":2.5},{"from":"f1_corridor_n1","to":"f1_corridor_n2","mode":"corridor","distance_m":12,"wait_seconds":0,"weight":10},{"from":"f1_corridor_n2","to":"f1_door_A-F1-02","mode":"corridor","distance_m":3,"wait_seconds":0,"weight":2.5}],"distance_m":18,"route_cost_seconds":15,"provenance":"SYNTHETIC"}
+```
+
+Same-room example:
+
+```json
+{"from_room":"A-F1-10","to_room":"A-F1-10","mode":"stairs","node_keys":["f1_door_A-F1-10"],"edges":[],"distance_m":0,"route_cost_seconds":0,"provenance":"SYNTHETIC"}
+```
+
+Navigation costs are configurable through `NAV_METRES_PER_PIXEL`, `NAV_STAIRS_METRES_PER_FLOOR`, `NAV_LIFT_METRES_PER_FLOOR`, `NAV_LIFT_WAIT_SECONDS`, and `NAV_WALKING_SPEED_MPS`.
