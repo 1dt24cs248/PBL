@@ -12,7 +12,7 @@ from app.optimizer.service import _session_data, solve_energy
 from app.optimizer.validator import validate_assignment
 from app.routers.optimizer import EnergyRequest
 from app.seed import seed
-from app.experiments.energy import _greedy_first_fit, _relocations_extra, _write_csv
+from app.experiments.energy import E6_COLUMNS, _greedy_first_fit, _relocations_extra, _write_csv
 import csv
 
 
@@ -121,6 +121,40 @@ def test_independent_validator_rejects_corrupted_assignments():
         section_strengths={"A": 50, "B": 10}, forbid_floors={1})
     kinds = {row["type"] for row in result["violations"]}
     assert {"capacity", "room_double_booking", "forbidden_room"}.issubset(kinds)
+
+
+def test_validator_no_new_clashes_allows_fixed_source_and_rejects_new_room_clash():
+    rooms = [
+        {"room_id": "R1", "floor": 1, "capacity": 50, "room_type": "classroom", "status": "available", "timetable_eligible": True},
+        {"room_id": "R2", "floor": 1, "capacity": 50, "room_type": "classroom", "status": "available", "timetable_eligible": True},
+        {"room_id": "R3", "floor": 2, "capacity": 50, "room_type": "classroom", "status": "available", "timetable_eligible": True},
+    ]
+    sessions = [
+        {"id": 1, "term_code": "T", "day": "Mon", "start_period": 1, "end_period": 1, "section_code": "A", "batch": "ALL", "room_id": "R1", "room_required": True, "faculty_initials": []},
+        {"id": 2, "term_code": "T", "day": "Mon", "start_period": 1, "end_period": 1, "section_code": "B", "batch": "ALL", "room_id": "R1", "room_required": True, "faculty_initials": []},
+        {"id": 3, "term_code": "T", "day": "Tue", "start_period": 1, "end_period": 1, "section_code": "C", "batch": "ALL", "room_id": "R2", "room_required": True, "faculty_initials": ["FX"]},
+        {"id": 4, "term_code": "T", "day": "Tue", "start_period": 1, "end_period": 1, "section_code": "D", "batch": "ALL", "room_id": "R3", "room_required": True, "faculty_initials": ["FX"]},
+    ]
+    original = validate_assignment(sessions, rooms, {}, movable_ids={3}, no_new_clashes=True)
+    assert original["valid"] is True
+    assert original["new_clashes"] == []
+    assert original["fixed_clashes_remaining"] == 2  # one fixed room clash and one invariant faculty clash
+
+    corrupted = validate_assignment(sessions, rooms, {3: "R3"}, movable_ids={3}, no_new_clashes=True)
+    assert corrupted["valid"] is False
+    assert len(corrupted["new_clashes"]) == 1
+    assert corrupted["new_clashes"][0]["type"] == "room"
+
+
+def test_e6_csv_columns_and_greedy_determinism_contract(tmp_path):
+    assert E6_COLUMNS == ["variant", "strategy", "kwh_week", "cost_week_inr", "rooms_used", "floors_used",
+        "relocations", "students_affected", "new_clashes", "fixed_clashes_remaining", "solver_status",
+        "solve_time_s", "objective_value"]
+    path = tmp_path / "e6.csv"
+    _write_csv(path, [{column: "x" for column in E6_COLUMNS}], E6_COLUMNS)
+    with path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.reader(handle))
+    assert all(len(row) == len(E6_COLUMNS) for row in rows)
 
 
 def test_closing_room_moves_explicit_session_and_locked_lab_is_infeasible():
