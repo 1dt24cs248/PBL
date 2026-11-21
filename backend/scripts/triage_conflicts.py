@@ -100,9 +100,9 @@ def build_report(parsed: ParsedTimetables) -> str:
         f"5F {f_thursday}",
         "```",
         "",
-        "Parse path: the parser identifies the two `B1`/`B2` markers in source order, emits two parallel 5C sessions sharing a `block_id`, and resolves explicit `210 A` to `A-F2-10` (B2) and `206 A` to `A-F2-06` (B1). The 5F `A 211` labels resolve to `A-F2-10` because the source room directory explicitly lists A-F2-10 aliases A-209/A-210/A-211. Thus 5F's explicit room 211 is the same canonical room as 5C's explicit B2 room 210; 5C B1 remains in A-F2-06. The two room conflicts are source conflicts as written, classified `AS_WRITTEN_BOTH_EXPLICIT`.",
+        "Parse path after resolver correction: the parser reads both B1/B2 branches from the 5C source row, producing parallel sessions with one `block_id`: 5C B2 `210 A` -> `A-F2-10`, and B1 `206 A` -> `A-F2-06`. The explicit 5F `A 211` label resolves to `A-F2-11`; it no longer collides with 5C B2. The prior 5C/5F room clash was caused by the erroneous F2-10 alias mapping and is removed. The source timetable row was not changed.",
         "",
-        "Parser defect fixed: the prior parser only recognized lab branches when B1 appeared before B2. Since the 5C source lists B2 first, it previously collapsed the whole block into one `ALL` session in the first room. It now reads both branches regardless of order. Regression coverage asserts both rooms, batches, shared block ID, and only the B2/5F room clash. Source data was not changed.",
+        "Regression coverage asserts that `@ A 211` resolves to `A-F2-11`, the 5C parallel lab sessions retain separate rooms and a shared block ID, and the erroneous 5C/5F overlap is absent. Source data was not changed.",
         "",
     ])
     return "\n".join(lines)

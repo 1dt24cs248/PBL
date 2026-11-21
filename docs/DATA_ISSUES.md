@@ -38,8 +38,8 @@ Counts are parsed from the three timetable datasets; no clash was automatically 
 - Sessions with an INFERRED room assignment: 323
 - Sessions with room_required=False: 58
 - Excluded B-Block lab entries: 10
-- Conflicts per type: room: 62, faculty: 26, section: 0
-- Conflicts per term/type: 2024-25-EVEN faculty: 2, 2025-26-ODD faculty: 16, 2025-26-ODD room: 50, 2026-27-ODD faculty: 8, 2026-27-ODD room: 12
+- Conflicts per type: room: 60, faculty: 26, section: 0
+- Conflicts per term/type: 2024-25-EVEN faculty: 2, 2025-26-ODD faculty: 16, 2025-26-ODD room: 50, 2026-27-ODD faculty: 8, 2026-27-ODD room: 10
 - Room conflicts involving at least one inferred room assignment: 55 (these are provisional pending room confirmation).
 
 ### Detected source clashes
@@ -55,8 +55,6 @@ Counts are parsed from the three timetable datasets; no clash was automatically 
 - 2026-27-ODD room clash on Thu P3: section A `Thu P3 CNS (KS)` and section E `Thu P3 TOC @ A 202`. [inferred room assignment involved]
 - 2026-27-ODD room clash on Thu P4: section A `Thu P4 ML (SHK)` and section E `Thu P4 CNS @ A 202`. [inferred room assignment involved]
 - 2026-27-ODD faculty clash on Thu P6: section A `Thu P6 FCG (SD)` and section F `Thu P6 FCG @ A 201`.
-- 2026-27-ODD room clash on Thu P1: section C `Thu P1-P2 CG LAB / NEXT GEN LAB (B2: AB, SD @ 210 A / B1: RM, LM @ 206 A)` and section F `Thu P1 ML @ A 211`.
-- 2026-27-ODD room clash on Thu P2: section C `Thu P1-P2 CG LAB / NEXT GEN LAB (B2: AB, SD @ 210 A / B1: RM, LM @ 206 A)` and section F `Thu P2 CNS @ A 211`.
 - 2026-27-ODD faculty clash on Thu P4: section D `Thu P4 CNS (UCR)` and section E `Thu P4 CNS @ A 202`.
 - 2026-27-ODD room clash on Thu P6: section D `Thu P6-P7 CG LAB / NEXT GEN LAB (B2: MN, RM @ 210 A / B1: RS, KM @ 206 A)` and section E `Thu P5-P6 CG LAB / NEXT GEN LAB (B2: MS, AL @ 210 A / B1: MA, KSL @ 206 A)`.
 - 2026-27-ODD room clash on Thu P6: section D `Thu P6-P7 CG LAB / NEXT GEN LAB (B2: MN, RM @ 210 A / B1: RS, KM @ 206 A)` and section E `Thu P5-P6 CG LAB / NEXT GEN LAB (B2: MS, AL @ 210 A / B1: MA, KSL @ 206 A)`.
