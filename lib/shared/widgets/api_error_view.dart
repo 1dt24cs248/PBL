@@ -21,6 +21,7 @@ class ApiErrorView extends StatelessWidget {
       401 => 'Your session expired. Redirecting to login.',
       403 => 'You do not have permission to view this data.',
       404 => notFoundMessage ?? 'No matching data was found.',
+      422 => 'Invalid request: ${failure.message}',
       _ when failure.isNetworkError => 'Network error. Check your connection.',
       _ => 'Unable to load data.',
     };

@@ -228,10 +228,21 @@ class TimetableFailure implements Exception {
     if (error is TimetableFailure) return error;
     if (error is DioException) {
       final status = error.response?.statusCode;
-      final detail = error.response?.data;
-      final message = detail is Map<String, dynamic>
-          ? detail['detail']?.toString()
+      final responseData = error.response?.data;
+      final detail = responseData is Map<String, dynamic>
+          ? responseData['detail']
           : null;
+      final message = switch (detail) {
+        List<dynamic> values => values
+            .map((item) {
+              if (item is Map<String, dynamic>) return item['msg']?.toString();
+              return item.toString();
+            })
+            .whereType<String>()
+            .join('; '),
+        null => null,
+        _ => detail.toString(),
+      };
       return TimetableFailure(
         status,
         message ?? error.message ?? 'Request failed',
