@@ -1,9 +1,9 @@
 {
-  "git_commit_hash": "f77b31830b7f2bbe7a1f106e74bbcfea4ab82664",
+  "git_commit_hash": "1bd01a0b0876d773291e9c460fdcb24eaaefbf1a",
   "ortools_version": "9.12.4544",
   "python_version": "3.11.0",
   "seeds": {
-    "E1_E2_E3": "deterministic; seed=0; num_workers=1",
+    "E1_E3_E5_E6": "deterministic; seed=0; num_workers=1",
     "E4": "derived independently per (k, run)"
   },
   "settings": {
@@ -79,6 +79,10 @@
         ]
       }
     ],
+    "e3_lock_labs_variants": [
+      true,
+      false
+    ],
     "e4_runs_per_k": 20,
     "time_limit_s": 30,
     "num_workers": 1,
@@ -88,13 +92,49 @@
       0.5,
       1,
       2
-    ]
+    ],
+    "e6_variants": [
+      "V1_inferred_theory",
+      "V2_all_theory",
+      "V3_all_theory_and_labs"
+    ],
+    "e6_relocation_budgets": [
+      0,
+      5,
+      10,
+      20
+    ],
+    "e6_energy_weights": [
+      0,
+      0.25,
+      0.5,
+      1,
+      2
+    ],
+    "e6_no_new_clash_validation": true
   },
   "term": "2026-27-ODD",
+  "audit_metrics": {
+    "active_term_sessions": 177,
+    "v1_movable_sessions": 73,
+    "v1_sessions_with_multiple_feasible_rooms": 73,
+    "v1_free_of_all_source_conflicts": 58,
+    "v1_feasible_room_domain_counts": {
+      "20": 6,
+      "21": 32,
+      "22": 35
+    },
+    "source_conflicts_by_type": {
+      "faculty": 8,
+      "room": 10
+    }
+  },
   "data_status_notes": [
-    "Synthetic equipment wattages and tariff.",
-    "Inferred timetable room assignments; source conflicts remain reported.",
+    "Synthetic equipment wattages and Rs 8.50/kWh tariff.",
+    "Requested source summary reports 317/463 inferred-room sessions; current parser measured 323/475.",
+    "Fixed source room/faculty conflicts are retained and reported; room-only assignment does not change faculty or section overlap.",
+    "SQLite only; PostgreSQL unverified.",
     "No real DSATM meter readings are available."
   ],
-  "timestamp_utc": "2026-11-21T13:33:10.732669+00:00"
+  "timestamp_utc": "2026-11-21T16:07:47.264069+00:00"
 }

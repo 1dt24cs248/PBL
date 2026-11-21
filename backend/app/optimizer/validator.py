@@ -1,6 +1,8 @@
 """Independent hard-constraint validator for proposed room assignments."""
 from collections import defaultdict
 
+from ..timetable_import import detect_conflicts
+
 
 def _slot_keys(session: dict):
     start = session.get("start_period", min(session.get("periods", [1])))
@@ -13,10 +15,17 @@ def _lab(session: dict) -> bool:
                 or "LAB" in session.get("raw_label", "").upper())
 
 
+def _conflict_key(conflict: dict, rows: list[dict]) -> tuple:
+    first, second = (rows[index] for index in conflict["session_indices"])
+    return (conflict["type"], conflict["term_code"], conflict["day"], conflict["period"],
+            tuple(sorted((first["id"], second["id"]))))
+
+
 def validate_assignment(sessions: list[dict], rooms: list[dict], assignments: dict[int, str], *,
                         movable_ids: set[int] | None = None, section_strengths: dict[str, int] | None = None,
                         max_relocations: int | None = None, forbid_floors: set[int] | None = None,
-                        forbid_rooms: set[str] | None = None, lock_labs: bool = True) -> dict:
+                        forbid_rooms: set[str] | None = None, lock_labs: bool = True,
+                        no_new_clashes: bool = False) -> dict:
     movable_ids = movable_ids or set()
     section_strengths = section_strengths or {}
     forbid_floors, forbid_rooms = forbid_floors or set(), forbid_rooms or set()
@@ -60,15 +69,38 @@ def validate_assignment(sessions: list[dict], rooms: list[dict], assignments: di
         if lock_labs and _lab(session) and sid in movable_ids:
             violations.append({"type": "locked_lab_moved", "session_id": sid})
 
-    slots = defaultdict(list)
-    for session in sessions:
-        if session.get("room_required") and chosen.get(session["id"]):
-            for day, period in _slot_keys(session):
-                slots[(chosen[session["id"]], day, period)].append(session["id"])
-    for (rid, day, period), ids in slots.items():
-        if len(ids) > 1 and any(identifier in movable_ids for identifier in ids):
-            violations.append({"type": "room_double_booking", "room_id": rid, "day": day,
-                               "period": period, "session_ids": sorted(ids)})
+    if no_new_clashes:
+        proposed_rows = [dict(session, room_id=chosen[session["id"]]) for session in sessions]
+        fixed_room_rows = [row for row in proposed_rows if row["id"] not in movable_ids]
+        fixed_room_conflicts = [conflict for conflict in detect_conflicts(fixed_room_rows)
+                                if conflict["type"] == "room"]
+        # Room assignment cannot change section, faculty, or time. Treat those
+        # source conflicts as fixed in those dimensions, even if a session's
+        # room is movable; a room-only strategy cannot introduce or resolve them.
+        source_static_conflicts = [conflict for conflict in detect_conflicts(sessions)
+                                   if conflict["type"] in {"faculty", "section"}]
+        allowed = {_conflict_key(conflict, fixed_room_rows) for conflict in fixed_room_conflicts}
+        allowed.update(_conflict_key(conflict, sessions) for conflict in source_static_conflicts)
+        all_conflicts = detect_conflicts(proposed_rows)
+        fixed_clashes = [conflict for conflict in all_conflicts
+                         if _conflict_key(conflict, proposed_rows) in allowed]
+        new_clashes = [conflict for conflict in all_conflicts
+                       if _conflict_key(conflict, proposed_rows) not in allowed]
+        for conflict in new_clashes:
+            indexes = conflict["session_indices"]
+            violations.append({"type": "new_clash", "clash_type": conflict["type"],
+                               "day": conflict["day"], "period": conflict["period"],
+                               "session_ids": sorted(proposed_rows[index]["id"] for index in indexes)})
+    else:
+        slots = defaultdict(list)
+        for session in sessions:
+            if session.get("room_required") and chosen.get(session["id"]):
+                for day, period in _slot_keys(session):
+                    slots[(chosen[session["id"]], day, period)].append(session["id"])
+        for (rid, day, period), ids in slots.items():
+            if len(ids) > 1 and any(identifier in movable_ids for identifier in ids):
+                violations.append({"type": "room_double_booking", "room_id": rid, "day": day,
+                                   "period": period, "session_ids": sorted(ids)})
     parallel = defaultdict(dict)
     for session in sessions:
         if session.get("batch") in {"B1", "B2"} and session.get("block_id"):
@@ -79,4 +111,12 @@ def validate_assignment(sessions: list[dict], rooms: list[dict], assignments: di
     relocations = sum(chosen[s["id"]] != s.get("room_id") for s in sessions if s["id"] in movable_ids)
     if max_relocations is not None and relocations > max_relocations:
         violations.append({"type": "max_relocations", "limit": max_relocations, "actual": relocations})
-    return {"valid": not violations, "violations": violations}
+    result = {"valid": not violations, "violations": violations}
+    if no_new_clashes:
+        result["new_clashes"] = [{"type": row["clash_type"], "day": row["day"],
+                                  "period": row["period"], "session_ids": row["session_ids"]}
+                                 for row in violations if row["type"] == "new_clash"]
+        result["fixed_clashes_remaining"] = len(fixed_clashes)
+        result["fixed_clashes_by_type"] = {kind: sum(c["type"] == kind for c in fixed_clashes)
+                                            for kind in sorted({c["type"] for c in fixed_clashes})}
+    return result

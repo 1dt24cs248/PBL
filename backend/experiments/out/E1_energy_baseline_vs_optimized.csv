@@ -1,5 +1,5 @@
 movable,lock_labs,kwh_week_before,kwh_week_after,cost_week_inr_before,cost_week_inr_after,percent_saving,relocations,students_affected,clashes_before,clashes_after,solver_status,solve_time_s,deterministic
-inferred_only,True,91.410001,116.8475,776.96,993.17,-27.827917,38,226,18,12,OPTIMAL,0.171237,True
-inferred_only,False,91.410001,91.410001,776.96,776.96,0.0,0,0,18,18,INFEASIBLE,0.126359,True
-all,True,91.410001,124.978333,776.96,1062.29,-36.722822,51,286,18,12,OPTIMAL,0.256179,True
-all,False,91.410001,91.410001,776.96,776.96,0.0,0,0,18,18,INFEASIBLE,0.111458,True
+inferred_only,True,91.410001,116.8475,776.96,993.17,-27.827917,38,226,18,12,OPTIMAL,0.675894,True
+inferred_only,False,91.410001,91.410001,776.96,776.96,0.0,0,0,18,18,INFEASIBLE,0.421272,True
+all,True,91.410001,124.978333,776.96,1062.29,-36.722822,51,286,18,12,OPTIMAL,0.78592,True
+all,False,91.410001,91.410001,776.96,776.96,0.0,0,0,18,18,INFEASIBLE,0.471823,True
