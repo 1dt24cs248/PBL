@@ -9,6 +9,9 @@ import '../../features/dashboards/hod/hod_dashboard_screen.dart';
 import '../../features/dashboards/management/management_dashboard_screen.dart';
 import '../../features/dashboards/student/student_dashboard_screen.dart';
 import '../../features/events/events_screen.dart';
+import '../../features/energy/energy_dashboard_screen.dart';
+import '../../features/energy/optimizer_screen.dart';
+import '../../features/energy/proposals_screen.dart';
 import '../../features/extra_class_requests/extra_class_requests_screen.dart';
 import '../../features/library/library_screen.dart';
 import '../../features/maintenance/maintenance_screen.dart';
@@ -27,6 +30,16 @@ String roleDashboardRoute(String role) => switch (role) {
   _ => '/login',
 };
 
+String? energyRouteRedirect(String role, String location) {
+  if (location == '/energy' && role != 'admin' && role != 'hod') {
+    return roleDashboardRoute(role);
+  }
+  if (location == '/energy/optimizer' && role != 'admin') {
+    return role == 'hod' ? '/energy' : roleDashboardRoute(role);
+  }
+  return null;
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
   return GoRouter(
@@ -38,7 +51,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.matchedLocation == '/login';
       if (user == null) return loggingIn ? null : '/login';
       if (loggingIn) return roleDashboardRoute(user.role);
-      return null;
+      return energyRouteRedirect(user.role, state.matchedLocation);
     },
     routes: [
       GoRoute(
@@ -60,6 +73,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/rooms/availability',
         builder: (context, state) => const RoomAvailabilityScreen(),
+      ),
+      GoRoute(
+        path: '/energy',
+        builder: (context, state) => const EnergyDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/energy/optimizer',
+        builder: (context, state) => const OptimizerScreen(),
+      ),
+      GoRoute(
+        path: '/proposals',
+        builder: (context, state) => const ProposalListScreen(),
+      ),
+      GoRoute(
+        path: '/proposals/:proposalId',
+        builder: (context, state) => ProposalDetailScreen(
+          proposalId: state.pathParameters['proposalId']!,
+        ),
       ),
       GoRoute(
         path: '/faculty',

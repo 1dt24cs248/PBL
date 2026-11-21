@@ -21,6 +21,12 @@ class HodDashboardScreen extends StatelessWidget {
         route: '/rooms/availability',
         icon: Icons.meeting_room_outlined,
       ),
+      DashboardDestination(
+        title: 'Energy Dashboard',
+        subtitle: 'Read energy and utilization reports',
+        route: '/energy',
+        icon: Icons.bolt_outlined,
+      ),
     ],
   );
 }
