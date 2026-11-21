@@ -6,6 +6,8 @@ class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const EmptyState(title: 'Notifications');
+  Widget build(BuildContext context) => const EmptyState(
+    title: 'Notifications',
+    message: 'Coming in this build.',
+  );
 }

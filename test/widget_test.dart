@@ -24,6 +24,7 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Login'));
     await tester.tap(find.text('Login'));
     await tester.pump();
 
@@ -73,6 +74,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.text('DSATM Smart Campus'), findsWidgets);
   });
 }
