@@ -6,7 +6,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
-from app.models import User
+from app.models import NavNode, Room, User
 from app.seed import DEV_PASSWORD, seed
 
 
@@ -29,6 +29,7 @@ def nav_client():
     app.dependency_overrides[get_db] = override
     client = TestClient(app)
     client.student_username = student_username
+    client.SessionLocal = SessionLocal
     yield client
     app.dependency_overrides.clear()
     engine.dispose()
@@ -69,6 +70,70 @@ def test_floorplan_occupancy_and_holiday(nav_client):
                for row in holiday.json()["rooms"])
 
 
+def test_floorplan_additive_map_contract_and_database_coordinates(nav_client):
+    headers = auth(nav_client, "admin1")
+    response = nav_client.get("/floorplan/3?day=Wed&period=1", headers=headers)
+    assert response.status_code == 200
+    payload = response.json()
+    assert {"floor", "label", "canvas", "date", "weekday", "holiday", "rooms"}.issubset(payload)
+    assert (payload["floor"], payload["label"], payload["canvas"], payload["date"],
+            payload["weekday"], payload["holiday"]) == (3, "Third Floor", {"width": 1000, "height": 600}, None, "Wed", None)
+    assert {"cores", "nav_nodes"}.issubset(payload)
+    assert [core["label"] for core in payload["cores"]] == ["West stairs", "Center lift", "East stairs"]
+    for core in payload["cores"]:
+        assert {"x", "y", "w", "h", "label"}.issubset(core)
+    assert payload["nav_nodes"]
+    for node in payload["nav_nodes"]:
+        assert {"node_key", "kind", "floor", "x", "y", "label"}.issubset(node)
+    room = next(row for row in payload["rooms"] if row["room_id"] == "A-F3-05")
+    assert {"room_id", "geometry", "color", "status", "capacity_effective", "data_status", "occupancy"}.issubset(room)
+    assert {key: room[key] for key in ("room_id", "geometry", "color", "status", "capacity_effective", "data_status", "occupancy")} == {
+        "room_id": "A-F3-05", "geometry": {"x": 780.0, "y": 40.0, "w": 160.0, "h": 210.0},
+        "color": "#D8B4FE", "status": "available", "capacity_effective": 30,
+        "data_status": "SYNTHETIC", "occupancy": {"occupied": False, "sessions": []}}
+    assert {"real_label", "aliases"}.issubset(room)
+    assert room["real_label"] == "Computer Lab 05"
+    assert room["aliases"] == ["305"]
+
+    with nav_client.SessionLocal() as db:
+        db_nodes = {node.node_key: node for node in db.query(NavNode).filter(NavNode.floor == 3)}
+        assert set(db_nodes) == {node["node_key"] for node in payload["nav_nodes"]}
+        for value in payload["nav_nodes"]:
+            node = db_nodes[value["node_key"]]
+            assert (value["floor"], value["x"], value["y"]) == (node.floor, node.x, node.y)
+        for core in payload["cores"]:
+            node = next(n for n in db_nodes.values() if _label_for_node(n.node_type) == core["label"])
+            assert (core["x"] + 40, core["y"] + 30) == (node.x, node.y)
+
+
+def _label_for_node(node_type):
+    return {"stairs_core_west": "West stairs", "lifts_core_center": "Center lift",
+            "stairs_core_east": "East stairs"}.get(node_type)
+
+
+def test_rooms_roomout_adds_map_metadata_without_removing_old_fields(nav_client):
+    headers = auth(nav_client, "fac1")
+    response = nav_client.get("/rooms", headers=headers)
+    assert response.status_code == 200
+    room = next(row for row in response.json() if row["number"] == "A-F1-10")
+    old_fields = {"id", "building_id", "number", "floor", "capacity", "room_type", "facilities",
+                  "status", "version", "provenance"}
+    assert old_fields.issubset(room)
+    assert {"real_label", "aliases", "data_status", "capacity_effective"}.issubset(room)
+    assert room["real_label"] == "Empty Room 10"
+    assert room["aliases"] == ["110", "A-108"]
+    assert room["data_status"] == room["provenance"] == "SYNTHETIC"
+    assert room["capacity_effective"] == room["capacity"] == 30
+    assert {key: room[key] for key in ("id", "building_id", "number", "floor", "capacity", "room_type", "facilities", "status", "version", "provenance")} == {
+        "id": 24, "building_id": 1, "number": "A-F1-10", "floor": 1, "capacity": 30,
+        "room_type": "Empty Room", "facilities": "", "status": "available", "version": 1,
+        "provenance": "SYNTHETIC"}
+
+    with nav_client.SessionLocal() as db:
+        source = db.get(Room, room["id"])
+        assert room["aliases"] == sorted(alias.alias for alias in source.aliases)
+
+
 def _route(client, headers, source, target, mode):
     return client.get(f"/nav/route?from={source}&to={target}&mode={mode}", headers=headers)
 
@@ -79,9 +144,28 @@ def test_same_floor_route_is_corridor_only_and_sums_edge_weights(nav_client):
     assert response.status_code == 200, response.text
     route = response.json()
     assert route["node_keys"] == ["f1_door_A-F1-01", "f1_corridor_n1", "f1_corridor_n2", "f1_door_A-F1-02"]
+    old_fields = {"from_room", "to_room", "mode", "node_keys", "edges", "distance_m", "route_cost_seconds", "provenance"}
+    assert old_fields.issubset(route)
+    assert {"path", "steps", "floors_visited"}.issubset(route)
     assert route["distance_m"] == pytest.approx(sum(edge["distance_m"] for edge in route["edges"]))
+    assert route["distance_m"] == pytest.approx(sum(step["distance_m"] for step in route["steps"]))
     assert route["route_cost_seconds"] == pytest.approx(sum(edge["weight"] for edge in route["edges"]))
     assert all(edge["mode"] == "corridor" for edge in route["edges"])
+    assert route["edges"] == [
+        {"from": "f1_door_A-F1-01", "to": "f1_corridor_n1", "mode": "corridor", "distance_m": 3.0, "wait_seconds": 0.0, "weight": 2.5},
+        {"from": "f1_corridor_n1", "to": "f1_corridor_n2", "mode": "corridor", "distance_m": 12.0, "wait_seconds": 0.0, "weight": 10.0},
+        {"from": "f1_corridor_n2", "to": "f1_door_A-F1-02", "mode": "corridor", "distance_m": 3.0, "wait_seconds": 0.0, "weight": 2.5},
+    ]
+    assert (route["distance_m"], route["route_cost_seconds"], route["provenance"]) == (18.0, 15.0, "SYNTHETIC")
+    assert [node["node_key"] for node in route["path"]] == route["node_keys"]
+    with nav_client.SessionLocal() as db:
+        db_nodes = {node.node_key: node for node in db.query(NavNode).all()}
+        for value in route["path"]:
+            node = db_nodes[value["node_key"]]
+            assert (value["floor"], value["x"], value["y"]) == (node.floor, node.x, node.y)
+            assert {"node_key", "floor", "x", "y", "kind", "label"}.issubset(value)
+        for step in route["steps"]:
+            assert {"instruction", "floor", "from_node", "to_node", "distance_m", "kind"}.issubset(step)
 
 
 def test_cross_floor_stairs_lift_accessible_and_alias_routes(nav_client):
@@ -93,6 +177,8 @@ def test_cross_floor_stairs_lift_accessible_and_alias_routes(nav_client):
     assert any(edge["mode"] == "stairs" for edge in stairs.json()["edges"])
     assert all(edge["mode"] != "lift" for edge in stairs.json()["edges"])
     assert any(edge["mode"] == "lift" for edge in lift.json()["edges"])
+    assert lift.json()["floors_visited"] == [1, 2, 3]
+    assert set(lift.json()["floors_visited"]) >= {1, 3}
     assert all(edge["mode"] != "stairs" for edge in accessible.json()["edges"])
     assert any(edge["mode"] == "lift" for edge in accessible.json()["edges"])
 

@@ -60,6 +60,22 @@ class Room(Base):
     building: Mapped[Building] = relationship(back_populates="rooms")
     aliases: Mapped[list["RoomAlias"]] = relationship(back_populates="room", cascade="all, delete-orphan")
 
+    @property
+    def real_label(self) -> str:
+        return self.name or self.number
+
+    @property
+    def alias_values(self) -> list[str]:
+        return sorted(alias.alias for alias in self.aliases)
+
+    @property
+    def data_status(self) -> str:
+        return self.provenance
+
+    @property
+    def capacity_effective(self) -> int:
+        return 0 if self.status in {"under_maintenance", "temporarily_unavailable"} else self.capacity
+
 
 class RoomAlias(Base):
     __tablename__ = "room_aliases"
