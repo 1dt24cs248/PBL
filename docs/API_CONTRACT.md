@@ -240,3 +240,119 @@ Same-room example:
 ```
 
 Navigation costs are configurable through `NAV_METRES_PER_PIXEL`, `NAV_STAIRS_METRES_PER_FLOOR`, `NAV_LIFT_METRES_PER_FLOOR`, `NAV_LIFT_WAIT_SECONDS`, and `NAV_WALKING_SPEED_MPS`.
+
+## Energy and optimization endpoints (M5/M6)
+
+All wattages, the `8.50 INR/kWh` tariff, and the optimization cost model are `SYNTHETIC`. Responses expose `data_status: "SYNTHETIC"` (derived room/session calculations may additionally report `INFERRED`). A period is 55 minutes by default (`period_hours = 55/60`); settings may override it. Unless configured otherwise, unoccupied standby use is zero. These endpoints never change official timetable rows during optimization; applying a proposal is a separate version-checked workflow.
+
+### `GET /energy/baseline?term={term_code}`
+
+Admin and HOD may read this report. Maintenance is denied. If `term` is omitted, the active term is used. `occupied_periods_week` counts unique occupied `(day, period)` slots per room, so a recorded same-room clash still counts that room once as on; clashes are separately counted. Sessions with `room_required: false` do not consume energy. The flat comparison uses the dataset's fixed 6 hours/day × 5 days/week assumption, not timetable occupancy.
+
+```json
+{
+  "term_code":"2026-27-ODD",
+  "period_hours":0.9166667,
+  "tariff_inr_per_kwh":8.5,
+  "data_status":"SYNTHETIC",
+  "timetable_occupancy":{
+    "rooms":[{"room_id":"A-F2-02","floor":2,"connected_kw":0.71,"occupied_periods_week":12,"kwh_week":7.82,"cost_week_inr":66.47,"data_status":"SYNTHETIC"}],
+    "floors":[{"floor":2,"occupied_periods_week":12,"kwh_week":7.82,"cost_week_inr":66.47}],
+    "block":{"occupied_periods_week":12,"kwh_week":7.82,"cost_week_inr":66.47},
+    "recorded_room_clashes":2
+  },
+  "flat_spec_baseline_6h_x_5days":{
+    "rooms":[{"room_id":"A-F2-02","kwh_week":21.3,"cost_week_inr":181.05}],
+    "floors":[{"floor":2,"kwh_week":21.3,"cost_week_inr":181.05}],
+    "block":{"kwh_week":21.3,"cost_week_inr":181.05},
+    "label":"Fixed equipment load × 6 h/day × 5 days/week"
+  }
+}
+```
+
+### `GET /energy/utilization?term={term_code}`
+
+Admin and HOD may read this report. Maintenance is denied. Occupancy percentage uses `periods_per_day × 6 days`; rooms with no occupied timetable periods are listed in `rooms_never_used`. Seat use is section strength divided by `capacity_effective`; batch sessions use half the section strength. `rooms_under_50_percent_seat_utilization` contains rooms with observed sessions and maximum observed seat utilization below 50%; rooms with unknown capacity are reported with `seat_utilization: null` and are not counted as below 50%.
+
+```json
+{
+  "term_code":"2026-27-ODD",
+  "periods_per_day":8,
+  "days_per_week":6,
+  "data_status":"INFERRED",
+  "rooms":[{"room_id":"A-F2-02","occupied_periods_week":12,"available_periods_week":48,"occupancy_percent":25.0,"capacity_effective":60,"seat_utilization":0.5,"data_status":"INFERRED"}],
+  "rooms_never_used":["A-F2-12"],
+  "rooms_under_50_percent_seat_utilization":[{"room_id":"A-F2-03","seat_utilization":0.25}]
+}
+```
+
+### `POST /optimizer/energy`
+
+Admin only. Creates and returns a draft proposal; it does not modify official timetable sessions. `movable` is `inferred_only` (default when omitted), `all`, or `selected_sections`; `sections` is a list of section codes used for `selected_sections`. `max_relocations` is null or a nonnegative integer; `lock_labs` defaults true; `forbid_floors` is a list of integer floor numbers; `forbid_rooms` is a list of canonical room IDs; `lambda_move` and `lambda_floor` are nonnegative objective weights; `time_limit_s` defaults to 30; `seed` defaults to 0.
+
+```json
+{
+  "term":"2026-27-ODD",
+  "movable":"inferred_only",
+  "sections":[],
+  "max_relocations":10,
+  "lock_labs":true,
+  "forbid_floors":[5],
+  "forbid_rooms":["A-F2-11"],
+  "lambda_move":1.0,
+  "lambda_floor":0.25,
+  "time_limit_s":30,
+  "seed":0
+}
+```
+
+Response is a persisted draft and includes the independent validator result. `solver_status` is `OPTIMAL`, `FEASIBLE`, `INFEASIBLE`, `MODEL_INVALID`, or `UNKNOWN`. Fixed-vs-fixed source clashes appear in `unresolvable_source_clashes`; they remain unchanged. The response records the OR-Tools version, time limit, seed, and one-worker deterministic configuration.
+
+```json
+{
+  "id":"proposal-uuid",
+  "status":"draft",
+  "term_code":"2026-27-ODD",
+  "solver_status":"OPTIMAL",
+  "solve_time_s":0.42,
+  "ortools_version":"x.y.z",
+  "time_limit_s":30,
+  "seed":0,
+  "num_workers":1,
+  "objective_value":123.45,
+  "objective":"minimize weekly room-on kWh × synthetic tariff + lambda_move × relocations + lambda_floor × students × floors changed",
+  "before":{"kwh_week":100.0,"cost_week_inr":850.0,"clash_count":4},
+  "after":{"kwh_week":82.0,"cost_week_inr":697.0,"clash_count":2},
+  "relocations":3,
+  "affected_students":120,
+  "affected_sections":["A","C"],
+  "changes":[{"session_id":501,"from_room":"A-F2-02","to_room":"A-F1-03","expected_session_version":1,"expected_from_room_version":1,"expected_to_room_version":1}],
+  "unresolvable_source_clashes":[{"type":"room","day":"Thu","period":4,"session_ids":[601,602]}],
+  "validator":{"valid":true,"violations":[]},
+  "data_status":"SYNTHETIC"
+}
+```
+
+An infeasible solve returns a persisted draft with `solver_status: "INFEASIBLE"`, no assignment changes, an empty `changes` list, and `infeasible_reason` when a binding reason can be identified. Constraints are never relaxed silently. The response uses the same metadata fields and contains the unchanged `before`/`after` values.
+
+### Proposal workflow
+
+`POST /proposals/{proposal_id}/submit`, `/approve`, `/reject`, and `/apply` use an empty JSON object `{}`. Admin may submit, reject, and apply. Admin may approve any proposal; HOD may approve only if every affected section belongs to their department. All authenticated roles may list and inspect proposals with `GET /proposals` and `GET /proposals/{proposal_id}`; student and maintenance roster restrictions remain in effect and proposal responses contain no student names or USNs. Submit moves a draft to submitted, approve moves it to approved, reject moves it to rejected, and apply moves an approved proposal to applied. Rejected/discarded proposals do not change timetable rows. Apply atomically checks the stored expected version of every changed session and source/destination room, updates room assignments and increments each changed session version; a stale version returns `409` and rolls back all changes.
+
+```json
+{"id":"proposal-uuid","status":"submitted","term_code":"2026-27-ODD"}
+```
+
+`GET /proposals` returns `[{"id":"proposal-uuid","status":"draft","term_code":"2026-27-ODD","solver_status":"OPTIMAL","data_status":"SYNTHETIC"}]`. `GET /proposals/{proposal_id}` returns the full optimizer response above plus workflow status. Unknown proposal IDs return `404`.
+
+### Energy and proposal errors / permissions
+
+Unauthenticated requests return `401` with `{"detail":"Not authenticated"}`. Authenticated roles without permission return `403` with `{"detail":"Insufficient permissions"}`. Unknown terms or proposal IDs return `404` with `{"detail":"Term not found"}` or `{"detail":"Proposal not found"}`. Stale versions while applying return `409` with `{"detail":"version conflict"}` and no timetable changes. Invalid fields (including negative relocation/time/weights or invalid `movable`) return `422` with FastAPI's `{"detail":[{"type":"...","loc":[...],"msg":"...","input":...}]}` shape.
+
+| Endpoint | student | teaching_faculty | hod | admin | maintenance |
+| --- | --- | --- | --- | --- | --- |
+| `GET /energy/baseline`, `GET /energy/utilization` | 403 | 403 | Read | Read | 403 |
+| `POST /optimizer/energy` | 403 | 403 | 403 | Draft | 403 |
+| `GET /proposals`, `GET /proposals/{id}` | Read | Read | Read | Read | Read |
+| `POST /proposals/{id}/submit`, `/reject`, `/apply` | 403 | 403 | 403 | Yes | 403 |
+| `POST /proposals/{id}/approve` | 403 | 403 | Own department only | Yes | 403 |
