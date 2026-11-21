@@ -378,3 +378,120 @@ Unauthenticated requests return `401` with `{"detail":"Not authenticated"}`. Aut
 | `GET /proposals`, `GET /proposals/{id}` | Read | Read | Read | Read | Read |
 | `POST /proposals/{id}/submit`, `/reject`, `/apply` | 403 | 403 | 403 | Yes | 403 |
 | `POST /proposals/{id}/approve` | 403 | 403 | Own department only | Yes | 403 |
+
+## M7 ERP, timetable, calendar, and navigation additions
+
+These additions preserve all existing response fields and meanings. All examples use synthetic or redacted identifiers; no real student identity is included. `data_status: "SYNTHETIC"` identifies generated attendance, fee, scholarship, and LMS demo content.
+
+### Room list and availability additions
+
+`GET /rooms` keeps its existing `RoomOut` fields and adds `timetable_eligible` so clients can see which rooms are scheduled for teaching. Its existing optional `status_filter` remains unchanged. `capacity` is the supplied dataset capacity, which is synthetic for these room records; no separate observed `capacity_real` value is available.
+
+`GET /rooms/availability?day={day}&period={period}&term={term}&include_non_timetable={bool}` adds optional `include_non_timetable`, default `false`. By default only timetable-eligible rooms are listed; `true` includes non-timetable rooms as well. `term` still selects the term used to calculate occupied slots. Room status and capacity are not additional availability filters. Response envelope and room fields retain the existing availability shape.
+
+```json
+{"day":"Wed","period":1,"term_code":"2026-27-ODD","rooms":[{"room_id":"A-F2-02","available":false,"session_ids":[501],"provenance":"SYNTHETIC"}]}
+```
+
+### Timetable session additive fields
+
+Every session returned by section, student, faculty, room, and date timetable endpoints retains its current fields and adds:
+
+- `session_type`: `Lecture`, `Lab`, or `Activity`.
+- `start_time`, `end_time`: 24-hour `HH:MM` strings from the period grid. End time is the end of the last occupied period.
+- `faculty_names`: ordered display-name list for every linked faculty member.
+- `faculty_details`: same-order `{name, data_status}` entries; ordinary names use their current provenance, and the section-E ERP-only display name uses `REAL_ERP_SCREENSHOT`.
+- `room_real_label`: room dataset label, or `null` for a roomless session.
+- `room_inferred`: whether the session's room assignment is inferred.
+
+Existing `faculty_name`, `room_id`, `provenance`, and all other response fields remain unchanged. Activity subjects include NPTEL/MOOC, PRE-PLACEMENT, NSS/YOGA, and Skill Dev; lab batches and lab subjects use `Lab`; other sessions use `Lecture`. Sessions sharing one multi-period block retain the same `block_id`.
+
+```json
+{"id":501,"term_code":"2026-27-ODD","section_code":"E","batch":"ALL","day":"Wed","periods":[1,2],"subject_code":"BCS502","subject_name":"Machine Learning","faculty_id":31,"faculty_initials":"PP","faculty_name":"Parvathisha Pudugosala","faculty_names":["Parvathisha Pudugosala"],"faculty_details":[{"name":"Parvathisha Pudugosala","data_status":"REAL_DSATM_PDF"}],"room_id":"A-F2-02","room_real_label":"Classroom 02","room_inferred":true,"room_required":true,"raw_label":"5TH E SECTION; P1-P2 ML (PP)","block_id":"2026-27-ODD-E-WED-P1-P2-1","session_type":"Lecture","start_time":"09:30","end_time":"11:20","provenance":"REAL_DSATM_PDF","version":1}
+```
+
+### `GET /meta/periods`
+
+Any authenticated role. Returns the period grid and breaks.
+
+```json
+{"periods":[{"period":1,"start":"09:30","end":"10:25"},{"period":2,"start":"10:25","end":"11:20"},{"period":3,"start":"11:35","end":"12:30"},{"period":4,"start":"12:30","end":"13:25"},{"period":5,"start":"14:15","end":"15:10"},{"period":6,"start":"15:10","end":"16:05"},{"period":7,"start":"16:05","end":"17:00"}],"breaks":[{"after_period":2,"label":"Tea","start":"11:20","end":"11:35"},{"after_period":4,"label":"Lunch","start":"13:25","end":"14:15"}]}
+```
+
+### Holidays and calendar
+
+#### `GET /calendar/holidays`
+
+Any authenticated role. Returns only the two confirmed entries currently in the seed. No other holidays are implied.
+
+```json
+[{"date":"2026-11-10","name":"Deepavali 2026","source":"M1"},{"date":"2026-11-27","name":"Kanaka Jayanthi","source":"ERP_SCREENSHOT"}]
+```
+
+#### `GET /calendar/summary`
+
+Any authenticated role. Terms have unknown boundaries; `start_date` and `end_date` are `null` and the response note explicitly says the dates are not known.
+
+```json
+{"holidays":[{"date":"2026-11-10","name":"Deepavali 2026","source":"M1"},{"date":"2026-11-27","name":"Kanaka Jayanthi","source":"ERP_SCREENSHOT"}],"terms":[{"term_code":"2026-27-ODD","start_date":null,"end_date":null}],"note":"Term start and end dates are not known."}
+```
+
+`GET /timetable/date/{YYYY-MM-DD}` keeps its current shape. For either seeded holiday, `holiday` is the holiday name and `sessions` is empty. The 2026-11-10 Deepavali behavior is unchanged; 2026-11-27 returns `"Kanaka Jayanthi"` in `holiday`.
+
+### Navigation instruction additions
+
+`GET /nav/route?from={room}&to={room}&mode={stairs|lift|accessible}` keeps `path`, `steps`, `node_keys`, `edges`, `floors_visited`, and every existing field unchanged. It adds `instructions` and `summary`.
+
+Each instruction has `{index, kind, text, floor, to_floor, distance_m, path_from_index, path_to_index}`. `kind` is `start`, `walk`, `stairs`, `lift`, or `arrive`; indexes are inclusive indexes into `path`. Corridor runs on one floor become one `walk`. A vertical transition is one stair/lift instruction. Instruction text uses room/core display labels and floor names, never raw graph node keys. Accessible routes contain no `stairs` instruction. The first instruction is `Leave …`, and the final instruction is `You have arrived at …`; for the same room only the `arrive` instruction is returned.
+
+`summary` has `{distance_m, est_seconds, est_minutes, floors_traversed, floors_changed, mode, start, end}`. `start` and `end` each have `{code, real_label, floor}`. `est_minutes` is rounded up; instruction distances sum to the unchanged top-level `distance_m` within 0.5 m.
+
+Example of the real accessible route `A-G06` to `A-F5-05`; coordinates and node keys stay in the existing `path` field, omitted here to focus on the new fields:
+
+```json
+{"instructions":[{"index":0,"kind":"start","text":"Leave Staff Room 06 (A-G06)","floor":0,"to_floor":null,"distance_m":0,"path_from_index":0,"path_to_index":0},{"index":1,"kind":"walk","text":"Walk 27 m along the Ground Floor corridor towards the Lift.","floor":0,"to_floor":null,"distance_m":27,"path_from_index":0,"path_to_index":4},{"index":2,"kind":"lift","text":"Take the Lift up 5 floors to Floor 5.","floor":0,"to_floor":5,"distance_m":40,"path_from_index":4,"path_to_index":9},{"index":3,"kind":"walk","text":"Walk 27 m along the Floor 5 corridor towards Computer Lab 05 (A-F5-05).","floor":5,"to_floor":null,"distance_m":27,"path_from_index":9,"path_to_index":13},{"index":4,"kind":"arrive","text":"You have arrived at Computer Lab 05 (A-F5-05)","floor":5,"to_floor":null,"distance_m":0,"path_from_index":13,"path_to_index":13}],"summary":{"distance_m":94,"est_seconds":178.3335,"est_minutes":3,"floors_traversed":[0,1,2,3,4,5],"floors_changed":5,"mode":"accessible","start":{"code":"A-G06","real_label":"Staff Room 06","floor":0},"end":{"code":"A-F5-05","real_label":"Computer Lab 05","floor":5}}}
+```
+
+### ERP-style synthetic student demo endpoints
+
+All five endpoints below are student-only, derive the student solely from the bearer token, accept no student identifier, and return `data_status: "SYNTHETIC"`. Non-students receive `403`; missing/invalid authentication receives `401`. These are generated demo values, not official student records. No phone, email, parent, photo, attendance-source, or uploaded-content fields are provided.
+
+#### `GET /students/me/profile`
+
+```json
+{"usn":"<authenticated student's own USN>","full_name":"<authenticated student's own roster name>","branch":"CS","department":"CSE","semester":5,"division":"CSE-5","section_label":"CS-5-E","section_mapping_status":"INFERRED","lab_batch":"A1","roll_no":null,"home_room":{"code":"A-F2-02","real_label":"Classroom 02"},"data_status":"SYNTHETIC"}
+```
+
+#### `GET /students/me/attendance?from={YYYY-MM-DD}&to={YYYY-MM-DD}`
+
+Dates default from configured `demo_attendance_start` (default 2026-10-01) through yesterday. Only past Monday–Saturday dates are returned. One timetable entry, including a multi-period block, is one slot. A holiday or day without sessions has a placeholder slot with status `-`; these placeholders do not count as attendance. Statuses `P`, `A`, and `NA` are stateless deterministic values derived from SHA-256 of the USN, date, slot key, subject, and configured demo salt. About 3% are `NA`; the remaining values use a deterministic subject probability between 0.72 and 0.96.
+
+```json
+{"data_status":"SYNTHETIC","days":[{"date":"2026-11-20","weekday":"Fri","slots":[{"slot":"P1","subject_code":"BCS515B","subject_name":"Cryptography & Network Security","status":"P"}]},{"date":"2026-11-21","weekday":"Sat","slots":[{"slot":null,"subject_code":null,"subject_name":null,"status":"-"}]}]}
+```
+
+#### `GET /students/me/attendance/summary`
+
+Computed from the same generated grid as the attendance endpoint. Percent is present divided by present plus absent, excluding `NA`; percentages are rounded to two decimals. `status` is `low` below 75%.
+
+```json
+{"data_status":"SYNTHETIC","overall":{"present":1,"absent":0,"no_attendance":0,"total":1,"percent":100.0},"subjects":[{"subject_code":"BCS515B","subject_name":"Cryptography & Network Security","component":"Theory","total":1,"present":1,"percent":100.0,"status":"ok"}]}
+```
+
+#### `GET /students/me/lms/subjects`
+
+Returns the nine semester-5 subjects for the authenticated student's mapped section, with dataset subject codes kept in `subject_code` and ERP alternatives in `alt_code`. It returns no marks or uploads.
+
+```json
+{"data_status":"SYNTHETIC","subjects":[{"subject_code":"BCS515B","alt_code":"BCS504B","subject_name":"Cryptography & Network Security","component":"Theory","semester":5,"faculty_names":["<display name>"]}]}
+```
+
+#### `GET /students/me/fees`
+
+All amounts and receipt entries are fictional, round settings-based placeholders. Receipt numbers use only the `SYN-` synthetic namespace; receipt mode is `SYNTHETIC`.
+
+```json
+{"data_status":"SYNTHETIC","ledger":{"to_be_collected":360000,"paid":240000,"previous":0,"pending":120000},"years":[{"year":1,"total":120000,"receipts":[{"receipt_no":"SYN-0001","date":"2024-06-01","heads":[{"name":"Tuition","amount":100000},{"name":"Academic","amount":10000},{"name":"Examination","amount":5000},{"name":"University","amount":3000},{"name":"Skill Lab","amount":2000}],"mode":"SYNTHETIC"}]}],"scholarship":{"status":"Not applicable","note":"Synthetic demo"}}
+```
+
+The fees example abbreviates the years list; the real response has years 1, 2, and 3. The attendance example abbreviates the date range. Those generated values are deterministic for the authenticated token and current configuration; they are not stored in database rows.
