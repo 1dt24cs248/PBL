@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class LoginRequest(BaseModel):
@@ -36,6 +36,10 @@ class RoomOut(BaseModel):
     status: str
     version: int
     provenance: str
+    real_label: str
+    aliases: list[str] = Field(validation_alias=AliasChoices("alias_values", "aliases"))
+    data_status: str
+    capacity_effective: int
 
 
 class RoomCreate(BaseModel):

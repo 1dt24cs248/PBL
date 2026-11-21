@@ -53,6 +53,51 @@ def _weekday(day: str | None, date_value: Date | None) -> str | None:
     return day
 
 
+def _node_label(node: NavNode) -> str:
+    if node.node_type == "stairs_core_west":
+        return "West stairs"
+    if node.node_type == "stairs_core_east":
+        return "East stairs"
+    if node.node_type == "lifts_core_center":
+        return "Center lift"
+    if node.node_type.startswith("corridor_n"):
+        return f"Corridor {node.node_type.removeprefix('corridor_').upper()}"
+    if node.node_type == "door":
+        return f"Door {node.room_id}"
+    return node.node_type.replace("_", " ").title()
+
+
+def _nav_node_out(node: NavNode) -> dict:
+    return {"node_key": node.node_key, "kind": node.node_type, "floor": node.floor,
+            "x": node.x, "y": node.y, "label": _node_label(node)}
+
+
+def _room_aliases(room: Room) -> list[str]:
+    return sorted(alias.alias for alias in room.aliases)
+
+
+def _route_path_node(node: NavNode) -> dict:
+    return {"node_key": node.node_key, "floor": node.floor, "x": node.x, "y": node.y,
+            "kind": node.node_type, "label": _node_label(node)}
+
+
+def _route_steps(path: list[dict], edges: list[dict]) -> list[dict]:
+    by_key = {node["node_key"]: node for node in path}
+    output = []
+    for edge in edges:
+        source, target = by_key[edge["from"]], by_key[edge["to"]]
+        if edge["mode"] == "stairs":
+            instruction = f"Take the stairs to Floor {target['floor']}"
+        elif edge["mode"] == "lift":
+            instruction = f"Take the lift to Floor {target['floor']}"
+        else:
+            instruction = f"Walk from {source['label']} to {target['label']}"
+        output.append({"instruction": instruction, "floor": target["floor"],
+                       "from_node": edge["from"], "to_node": edge["to"],
+                       "distance_m": edge["distance_m"], "kind": edge["mode"]})
+    return output
+
+
 @router.get("/floorplan")
 def list_floors(_user: User = Depends(get_current_user)):
     artifact = _artifact()
@@ -101,6 +146,11 @@ def get_floorplan(
         .order_by(Room.number)
     ))
     room_outputs = []
+    floor_nodes = list(db.scalars(select(NavNode).where(NavNode.floor == floor).order_by(NavNode.node_key)))
+    core_by_type = {node.node_type: node for node in floor_nodes}
+    cores = [{"x": core_by_type[kind].x - 40, "y": core_by_type[kind].y - 30, "w": 80, "h": 60,
+              "label": _node_label(core_by_type[kind])}
+             for kind in ("stairs_core_west", "lifts_core_center", "stairs_core_east") if kind in core_by_type]
     for room in rooms:
         if holiday or not time_filter:
             occupancy = {"occupied": False, "sessions": []} if holiday else None
@@ -130,6 +180,8 @@ def get_floorplan(
             "status": room.status,
             "capacity_effective": 0 if unavailable else room.capacity,
             "data_status": room.provenance,
+            "real_label": room.real_label,
+            "aliases": _room_aliases(room),
             "occupancy": occupancy,
         })
 
@@ -139,6 +191,8 @@ def get_floorplan(
         "date": date_value.isoformat() if date_value else None,
         "weekday": weekday,
         "holiday": holiday.name if holiday else None,
+        "cores": cores,
+        "nav_nodes": [_nav_node_out(node) for node in floor_nodes],
         "rooms": room_outputs,
     }
 
@@ -177,12 +231,16 @@ def nav_route(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Room door node not found")
     start, goal = doors[canonical_from].node_key, doors[canonical_to].node_key
     if canonical_from == canonical_to:
+        start_node = doors[canonical_from]
+        path = [_route_path_node(start_node)]
         return {"from_room": canonical_from, "to_room": canonical_to, "mode": mode,
                 "node_keys": [start], "edges": [], "distance_m": 0,
-                "route_cost_seconds": 0, "provenance": "SYNTHETIC"}
+                "route_cost_seconds": 0, "provenance": "SYNTHETIC", "path": path,
+                "steps": [], "floors_visited": [start_node.floor]}
 
     nodes = list(db.scalars(select(NavNode)))
     nodes_by_id = {node.id: node for node in nodes}
+    nodes_by_key = {node.node_key: node for node in nodes}
     allowed_modes = {"corridor", "stairs"} if mode == "stairs" else {"corridor", "lift"}
     adjacency: dict[str, list[tuple[str, NavEdge, float]]] = defaultdict(list)
     for edge in db.scalars(select(NavEdge)):
@@ -225,6 +283,9 @@ def nav_route(
         route_edges.append({"from": source, "to": target, "mode": edge.mode,
                             "distance_m": round(distance, 4), "wait_seconds": round(wait, 4),
                             "weight": round(weight, 4)})
+    route_nodes = [_route_path_node(nodes_by_key[key])
+                   for key in [start, *[target for _, target, _ in steps]]]
+    floors_visited = list(dict.fromkeys(node["floor"] for node in route_nodes))
     return {
         "from_room": canonical_from, "to_room": canonical_to, "mode": mode,
         "node_keys": [start, *[target for _, target, _ in steps]],
@@ -232,4 +293,7 @@ def nav_route(
         "distance_m": round(sum(edge["distance_m"] for edge in route_edges), 4),
         "route_cost_seconds": round(sum(edge["weight"] for edge in route_edges), 4),
         "provenance": "SYNTHETIC",
+        "path": route_nodes,
+        "steps": _route_steps(route_nodes, route_edges),
+        "floors_visited": floors_visited,
     }
