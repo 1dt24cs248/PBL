@@ -1,14 +1,11 @@
 {
-  "git_commit_hash": "901cdbe80b447167a208a4aca3eb664c547b2075",
+  "git_commit_hash": "f77b31830b7f2bbe7a1f106e74bbcfea4ab82664",
   "ortools_version": "9.12.4544",
   "python_version": "3.11.0",
-  "seeds": [
-    0,
-    1,
-    2,
-    3,
-    4
-  ],
+  "seeds": {
+    "E1_E2_E3": "deterministic; seed=0; num_workers=1",
+    "E4": "derived independently per (k, run)"
+  },
   "settings": {
     "period_hours": 0.9166666666666666,
     "standby_fraction": 0.0,
@@ -28,30 +25,76 @@
       20,
       null
     ],
-    "floor_scenarios": [
-      [
-        5
-      ],
-      [
-        4
-      ],
-      [
-        4,
-        5
-      ],
-      [
-        5,
-        3
-      ]
+    "closures": [
+      {
+        "floors": [
+          0
+        ]
+      },
+      {
+        "floors": [
+          1
+        ]
+      },
+      {
+        "floors": [
+          2
+        ]
+      },
+      {
+        "floors": [
+          3
+        ]
+      },
+      {
+        "floors": [
+          4
+        ]
+      },
+      {
+        "floors": [
+          5
+        ]
+      },
+      {
+        "floors": [
+          1,
+          2
+        ]
+      },
+      {
+        "floors": [
+          2,
+          3
+        ]
+      },
+      {
+        "rooms": [
+          "A-F2-02"
+        ]
+      },
+      {
+        "rooms": [
+          "A-F1-03"
+        ]
+      }
     ],
+    "e4_runs_per_k": 20,
     "time_limit_s": 30,
-    "num_workers": 1
+    "num_workers": 1,
+    "e5_energy_weights": [
+      0,
+      0.25,
+      0.5,
+      1,
+      2
+    ]
   },
   "term": "2026-27-ODD",
   "data_status_notes": [
     "Synthetic equipment wattages and tariff.",
-    "Imported and inferred timetable room assignments; source conflicts remain reported.",
+    "Inferred timetable room assignments; source conflicts remain reported.",
     "No real DSATM meter readings are available."
   ],
-  "timestamp_utc": "2026-11-21T12:12:27.672709+00:00"
+  "timestamp_utc": "2026-11-21T13:33:10.732669+00:00"
 }

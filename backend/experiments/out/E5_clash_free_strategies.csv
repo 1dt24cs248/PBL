@@ -1,0 +1,5 @@
+strategy,kwh_week,cost_week_inr,rooms_used,floors_used,relocations_vs_original,students_affected,solver_status,solve_time_s,reason
+greedy_first_fit,,,,,73,,INFEASIBLE,0,fixed source room clashes prevent clash-free timetable (count=10)
+cp_sat_min_relocations,,,,,38,,INFEASIBLE,1.243779,fixed source room clashes prevent clash-free timetable (count=10)
+cp_sat_energy_aware,,,,,38,,INFEASIBLE,0.692662,fixed source room clashes prevent clash-free timetable (count=10)
+baseline_with_clashes_not_comparable,91.410001,776.96,13,5,0,0,NOT_COMPARABLE,0,original assignment contains 10 room clashes
