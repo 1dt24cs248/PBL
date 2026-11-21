@@ -440,6 +440,10 @@ Any authenticated role. Terms have unknown boundaries; `start_date` and `end_dat
 
 `GET /timetable/date/{YYYY-MM-DD}` keeps its current shape. For either seeded holiday, `holiday` is the holiday name and `sessions` is empty. The 2026-11-10 Deepavali behavior is unchanged; 2026-11-27 returns `"Kanaka Jayanthi"` in `holiday`.
 
+```json
+{"date":"2026-11-27","weekday":"Fri","holiday":"Kanaka Jayanthi","sessions":[]}
+```
+
 ### Navigation instruction additions
 
 `GET /nav/route?from={room}&to={room}&mode={stairs|lift|accessible}` keeps `path`, `steps`, `node_keys`, `edges`, `floors_visited`, and every existing field unchanged. It adds `instructions` and `summary`.
