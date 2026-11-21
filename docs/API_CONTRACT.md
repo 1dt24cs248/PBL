@@ -459,7 +459,7 @@ All five endpoints below are student-only, derive the student solely from the be
 #### `GET /students/me/profile`
 
 ```json
-{"usn":"<authenticated student's own USN>","full_name":"<authenticated student's own roster name>","branch":"CS","department":"CSE","semester":5,"division":"CSE-5","section_label":"CS-5-E","section_mapping_status":"INFERRED","lab_batch":"A1","roll_no":null,"home_room":{"code":"A-F2-02","real_label":"Classroom 02"},"data_status":"SYNTHETIC"}
+{"usn":"<authenticated student's own USN>","full_name":"<authenticated student's own roster name>","branch":"CS","department":"CSE","semester":5,"division":"CSE-5","section_label":"CS-5-E","section_mapping_status":"INFERRED","lab_batch":"A1","roll_no":null,"home_room":{"code":"A-F5-02","real_label":"Classroom 02"},"data_status":"SYNTHETIC"}
 ```
 
 #### `GET /students/me/attendance?from={YYYY-MM-DD}&to={YYYY-MM-DD}`
