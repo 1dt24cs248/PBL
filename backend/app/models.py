@@ -53,6 +53,10 @@ class Room(Base):
     timetable_eligible: Mapped[bool] = mapped_column(Boolean, default=False)
     provenance: Mapped[str] = mapped_column(String(20), default="SYNTHETIC")
     notes: Mapped[str] = mapped_column(String(300), default="")
+    x: Mapped[float] = mapped_column(Float, default=0)
+    y: Mapped[float] = mapped_column(Float, default=0)
+    w: Mapped[float] = mapped_column(Float, default=0)
+    h: Mapped[float] = mapped_column(Float, default=0)
     building: Mapped[Building] = relationship(back_populates="rooms")
     aliases: Mapped[list["RoomAlias"]] = relationship(back_populates="room", cascade="all, delete-orphan")
 
@@ -201,3 +205,29 @@ class TimetableSessionFaculty(Base):
     session_id: Mapped[int] = mapped_column(ForeignKey("timetable_sessions.id", ondelete="CASCADE"), index=True)
     faculty_id: Mapped[int] = mapped_column(ForeignKey("faculty.id", ondelete="CASCADE"), index=True)
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class NavNode(Base):
+    __tablename__ = "nav_nodes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    node_key: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    floor: Mapped[int] = mapped_column(Integer, index=True)
+    node_type: Mapped[str] = mapped_column(String(30))
+    x: Mapped[float] = mapped_column(Float)
+    y: Mapped[float] = mapped_column(Float)
+    room_id: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="SYNTHETIC")
+
+
+class NavEdge(Base):
+    __tablename__ = "nav_edges"
+    __table_args__ = (UniqueConstraint("from_node_id", "to_node_id", "mode"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    from_node_id: Mapped[int] = mapped_column(ForeignKey("nav_nodes.id", ondelete="CASCADE"), index=True)
+    to_node_id: Mapped[int] = mapped_column(ForeignKey("nav_nodes.id", ondelete="CASCADE"), index=True)
+    mode: Mapped[str] = mapped_column(String(20))
+    distance_m: Mapped[float] = mapped_column(Float, default=0)
+    floor_delta: Mapped[int] = mapped_column(Integer, default=0)
+    wait_seconds: Mapped[float] = mapped_column(Float, default=0)
+    bidirectional: Mapped[bool] = mapped_column(Boolean, default=True)
+    provenance: Mapped[str] = mapped_column(String(20), default="SYNTHETIC")

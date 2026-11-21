@@ -1,0 +1,3513 @@
+{
+  "provenance": "SYNTHETIC",
+  "generated_by": "backend/app/floorplan_generator.py",
+  "canvas": {
+    "width": 1000,
+    "height": 600,
+    "metres_per_pixel": 0.06,
+    "corridor": {
+      "x": 0,
+      "y": 270,
+      "w": 1000,
+      "h": 60
+    }
+  },
+  "colors": {
+    "classroom": "#93C5FD",
+    "lab": "#D8B4FE",
+    "seminar": "#86EFAC",
+    "office": "#FED7AA",
+    "utility": "#CBD5E1",
+    "washroom": "#E2E8F0"
+  },
+  "floors": [
+    {
+      "floor": -1,
+      "label": "Basement",
+      "room_count": 4,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-B01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 430.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-B02",
+          "geometry": {
+            "x": 510.0,
+            "y": 40,
+            "w": 430.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-B03",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 430.0,
+            "h": 210
+          },
+          "color": "#86EFAC",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-B04",
+          "geometry": {
+            "x": 510.0,
+            "y": 350,
+            "w": 430.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f-1_stairs_core_west",
+          "floor": -1,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_lifts_core_center",
+          "floor": -1,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_stairs_core_east",
+          "floor": -1,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_corridor_n1",
+          "floor": -1,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_corridor_n2",
+          "floor": -1,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_corridor_n3",
+          "floor": -1,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_corridor_n4",
+          "floor": -1,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_corridor_n5",
+          "floor": -1,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_door_A-B01",
+          "floor": -1,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-B01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_door_A-B02",
+          "floor": -1,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-B02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_door_A-B03",
+          "floor": -1,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-B03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f-1_door_A-B04",
+          "floor": -1,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-B04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 0,
+      "label": "Ground Floor",
+      "room_count": 10,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-G01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G02",
+          "geometry": {
+            "x": 240.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G03",
+          "geometry": {
+            "x": 420.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#86EFAC",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G04",
+          "geometry": {
+            "x": 600.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G05",
+          "geometry": {
+            "x": 780.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G06",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G07",
+          "geometry": {
+            "x": 240.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G08",
+          "geometry": {
+            "x": 420.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G09",
+          "geometry": {
+            "x": 600.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-G10",
+          "geometry": {
+            "x": 780.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f0_stairs_core_west",
+          "floor": 0,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_lifts_core_center",
+          "floor": 0,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_stairs_core_east",
+          "floor": 0,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_corridor_n1",
+          "floor": 0,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_corridor_n2",
+          "floor": 0,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_corridor_n3",
+          "floor": 0,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_corridor_n4",
+          "floor": 0,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_corridor_n5",
+          "floor": 0,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G01",
+          "floor": 0,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-G01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G02",
+          "floor": 0,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-G02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G03",
+          "floor": 0,
+          "node_type": "door",
+          "x": 500,
+          "y": 250,
+          "room_id": "A-G03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G04",
+          "floor": 0,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-G04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G05",
+          "floor": 0,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-G05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G06",
+          "floor": 0,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-G06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G07",
+          "floor": 0,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-G07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G08",
+          "floor": 0,
+          "node_type": "door",
+          "x": 500,
+          "y": 350,
+          "room_id": "A-G08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G09",
+          "floor": 0,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-G09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f0_door_A-G10",
+          "floor": 0,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-G10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 1,
+      "label": "First Floor",
+      "room_count": 10,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-F1-01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-02",
+          "geometry": {
+            "x": 240.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-03",
+          "geometry": {
+            "x": 420.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-04",
+          "geometry": {
+            "x": 600.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-05",
+          "geometry": {
+            "x": 780.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-06",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-07",
+          "geometry": {
+            "x": 240.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-08",
+          "geometry": {
+            "x": 420.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-09",
+          "geometry": {
+            "x": 600.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F1-10",
+          "geometry": {
+            "x": 780.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f1_stairs_core_west",
+          "floor": 1,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_lifts_core_center",
+          "floor": 1,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_stairs_core_east",
+          "floor": 1,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_corridor_n1",
+          "floor": 1,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_corridor_n2",
+          "floor": 1,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_corridor_n3",
+          "floor": 1,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_corridor_n4",
+          "floor": 1,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_corridor_n5",
+          "floor": 1,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-01",
+          "floor": 1,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-F1-01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-02",
+          "floor": 1,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-F1-02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-03",
+          "floor": 1,
+          "node_type": "door",
+          "x": 500,
+          "y": 250,
+          "room_id": "A-F1-03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-04",
+          "floor": 1,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-F1-04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-05",
+          "floor": 1,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-F1-05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-06",
+          "floor": 1,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-F1-06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-07",
+          "floor": 1,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-F1-07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-08",
+          "floor": 1,
+          "node_type": "door",
+          "x": 500,
+          "y": 350,
+          "room_id": "A-F1-08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-09",
+          "floor": 1,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-F1-09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f1_door_A-F1-10",
+          "floor": 1,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-F1-10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 2,
+      "label": "Second Floor",
+      "room_count": 12,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-F2-01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-02",
+          "geometry": {
+            "x": 210.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-03",
+          "geometry": {
+            "x": 360.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-04",
+          "geometry": {
+            "x": 510.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-05",
+          "geometry": {
+            "x": 660.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-06",
+          "geometry": {
+            "x": 810.0,
+            "y": 40,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-07",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-08",
+          "geometry": {
+            "x": 210.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-09",
+          "geometry": {
+            "x": 360.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-10",
+          "geometry": {
+            "x": 510.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-11",
+          "geometry": {
+            "x": 660.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F2-12",
+          "geometry": {
+            "x": 810.0,
+            "y": 350,
+            "w": 130.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f2_stairs_core_west",
+          "floor": 2,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_lifts_core_center",
+          "floor": 2,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_stairs_core_east",
+          "floor": 2,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_corridor_n1",
+          "floor": 2,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_corridor_n2",
+          "floor": 2,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_corridor_n3",
+          "floor": 2,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_corridor_n4",
+          "floor": 2,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_corridor_n5",
+          "floor": 2,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-01",
+          "floor": 2,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-F2-01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-02",
+          "floor": 2,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-F2-02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-03",
+          "floor": 2,
+          "node_type": "door",
+          "x": 490.0,
+          "y": 250,
+          "room_id": "A-F2-03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-04",
+          "floor": 2,
+          "node_type": "door",
+          "x": 510.0,
+          "y": 250,
+          "room_id": "A-F2-04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-05",
+          "floor": 2,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-F2-05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-06",
+          "floor": 2,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-F2-06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-07",
+          "floor": 2,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-F2-07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-08",
+          "floor": 2,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-F2-08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-09",
+          "floor": 2,
+          "node_type": "door",
+          "x": 490.0,
+          "y": 350,
+          "room_id": "A-F2-09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-10",
+          "floor": 2,
+          "node_type": "door",
+          "x": 510.0,
+          "y": 350,
+          "room_id": "A-F2-10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-11",
+          "floor": 2,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-F2-11",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f2_door_A-F2-12",
+          "floor": 2,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-F2-12",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 3,
+      "label": "Third Floor",
+      "room_count": 10,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-F3-01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-02",
+          "geometry": {
+            "x": 240.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-03",
+          "geometry": {
+            "x": 420.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-04",
+          "geometry": {
+            "x": 600.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-05",
+          "geometry": {
+            "x": 780.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-06",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-07",
+          "geometry": {
+            "x": 240.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-08",
+          "geometry": {
+            "x": 420.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-09",
+          "geometry": {
+            "x": 600.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F3-10",
+          "geometry": {
+            "x": 780.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f3_stairs_core_west",
+          "floor": 3,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_lifts_core_center",
+          "floor": 3,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_stairs_core_east",
+          "floor": 3,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_corridor_n1",
+          "floor": 3,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_corridor_n2",
+          "floor": 3,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_corridor_n3",
+          "floor": 3,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_corridor_n4",
+          "floor": 3,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_corridor_n5",
+          "floor": 3,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-01",
+          "floor": 3,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-F3-01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-02",
+          "floor": 3,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-F3-02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-03",
+          "floor": 3,
+          "node_type": "door",
+          "x": 500,
+          "y": 250,
+          "room_id": "A-F3-03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-04",
+          "floor": 3,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-F3-04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-05",
+          "floor": 3,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-F3-05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-06",
+          "floor": 3,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-F3-06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-07",
+          "floor": 3,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-F3-07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-08",
+          "floor": 3,
+          "node_type": "door",
+          "x": 500,
+          "y": 350,
+          "room_id": "A-F3-08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-09",
+          "floor": 3,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-F3-09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f3_door_A-F3-10",
+          "floor": 3,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-F3-10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 4,
+      "label": "Fourth Floor",
+      "room_count": 10,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-F4-01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-02",
+          "geometry": {
+            "x": 240.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-03",
+          "geometry": {
+            "x": 420.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-04",
+          "geometry": {
+            "x": 600.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-05",
+          "geometry": {
+            "x": 780.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-06",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-07",
+          "geometry": {
+            "x": 240.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-08",
+          "geometry": {
+            "x": 420.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-09",
+          "geometry": {
+            "x": 600.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F4-10",
+          "geometry": {
+            "x": 780.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f4_stairs_core_west",
+          "floor": 4,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_lifts_core_center",
+          "floor": 4,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_stairs_core_east",
+          "floor": 4,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_corridor_n1",
+          "floor": 4,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_corridor_n2",
+          "floor": 4,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_corridor_n3",
+          "floor": 4,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_corridor_n4",
+          "floor": 4,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_corridor_n5",
+          "floor": 4,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-01",
+          "floor": 4,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-F4-01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-02",
+          "floor": 4,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-F4-02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-03",
+          "floor": 4,
+          "node_type": "door",
+          "x": 500,
+          "y": 250,
+          "room_id": "A-F4-03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-04",
+          "floor": 4,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-F4-04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-05",
+          "floor": 4,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-F4-05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-06",
+          "floor": 4,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-F4-06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-07",
+          "floor": 4,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-F4-07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-08",
+          "floor": 4,
+          "node_type": "door",
+          "x": 500,
+          "y": 350,
+          "room_id": "A-F4-08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-09",
+          "floor": 4,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-F4-09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f4_door_A-F4-10",
+          "floor": 4,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-F4-10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    },
+    {
+      "floor": 5,
+      "label": "Fifth Floor",
+      "room_count": 10,
+      "canvas": {
+        "width": 1000,
+        "height": 600,
+        "metres_per_pixel": 0.06,
+        "corridor": {
+          "x": 0,
+          "y": 270,
+          "w": 1000,
+          "h": 60
+        },
+        "room_rows": [
+          {
+            "y": 40,
+            "h": 210
+          },
+          {
+            "y": 350,
+            "h": 210
+          }
+        ]
+      },
+      "rooms": [
+        {
+          "room_id": "A-F5-01",
+          "geometry": {
+            "x": 60.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-02",
+          "geometry": {
+            "x": 240.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-03",
+          "geometry": {
+            "x": 420.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-04",
+          "geometry": {
+            "x": 600.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#93C5FD",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-05",
+          "geometry": {
+            "x": 780.0,
+            "y": 40,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#D8B4FE",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-06",
+          "geometry": {
+            "x": 60.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-07",
+          "geometry": {
+            "x": 240.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#FED7AA",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-08",
+          "geometry": {
+            "x": 420.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-09",
+          "geometry": {
+            "x": 600.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "room_id": "A-F5-10",
+          "geometry": {
+            "x": 780.0,
+            "y": 350,
+            "w": 160.0,
+            "h": 210
+          },
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ],
+      "nodes": [
+        {
+          "node_key": "f5_stairs_core_west",
+          "floor": 5,
+          "node_type": "stairs_core_west",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_lifts_core_center",
+          "floor": 5,
+          "node_type": "lifts_core_center",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_stairs_core_east",
+          "floor": 5,
+          "node_type": "stairs_core_east",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_corridor_n1",
+          "floor": 5,
+          "node_type": "corridor_n1",
+          "x": 100,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_corridor_n2",
+          "floor": 5,
+          "node_type": "corridor_n2",
+          "x": 300,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_corridor_n3",
+          "floor": 5,
+          "node_type": "corridor_n3",
+          "x": 500,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_corridor_n4",
+          "floor": 5,
+          "node_type": "corridor_n4",
+          "x": 700,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_corridor_n5",
+          "floor": 5,
+          "node_type": "corridor_n5",
+          "x": 900,
+          "y": 300,
+          "room_id": null,
+          "color": "#E2E8F0",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-01",
+          "floor": 5,
+          "node_type": "door",
+          "x": 100,
+          "y": 250,
+          "room_id": "A-F5-01",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-02",
+          "floor": 5,
+          "node_type": "door",
+          "x": 300,
+          "y": 250,
+          "room_id": "A-F5-02",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-03",
+          "floor": 5,
+          "node_type": "door",
+          "x": 500,
+          "y": 250,
+          "room_id": "A-F5-03",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-04",
+          "floor": 5,
+          "node_type": "door",
+          "x": 700,
+          "y": 250,
+          "room_id": "A-F5-04",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-05",
+          "floor": 5,
+          "node_type": "door",
+          "x": 900,
+          "y": 250,
+          "room_id": "A-F5-05",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-06",
+          "floor": 5,
+          "node_type": "door",
+          "x": 100,
+          "y": 350,
+          "room_id": "A-F5-06",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-07",
+          "floor": 5,
+          "node_type": "door",
+          "x": 300,
+          "y": 350,
+          "room_id": "A-F5-07",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-08",
+          "floor": 5,
+          "node_type": "door",
+          "x": 500,
+          "y": 350,
+          "room_id": "A-F5-08",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-09",
+          "floor": 5,
+          "node_type": "door",
+          "x": 700,
+          "y": 350,
+          "room_id": "A-F5-09",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        },
+        {
+          "node_key": "f5_door_A-F5-10",
+          "floor": 5,
+          "node_type": "door",
+          "x": 900,
+          "y": 350,
+          "room_id": "A-F5-10",
+          "color": "#CBD5E1",
+          "provenance": "SYNTHETIC"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "f-1_door_A-B01",
+      "to": "f-1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_door_A-B02",
+      "to": "f-1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_door_A-B03",
+      "to": "f-1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_door_A-B04",
+      "to": "f-1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_corridor_n1",
+      "to": "f-1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_corridor_n2",
+      "to": "f-1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_corridor_n3",
+      "to": "f-1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_corridor_n4",
+      "to": "f-1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_stairs_core_west",
+      "to": "f-1_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_lifts_core_center",
+      "to": "f-1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_stairs_core_east",
+      "to": "f-1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G01",
+      "to": "f0_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G02",
+      "to": "f0_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G03",
+      "to": "f0_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G04",
+      "to": "f0_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G05",
+      "to": "f0_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G06",
+      "to": "f0_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G07",
+      "to": "f0_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G08",
+      "to": "f0_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G09",
+      "to": "f0_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_door_A-G10",
+      "to": "f0_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_corridor_n1",
+      "to": "f0_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_corridor_n2",
+      "to": "f0_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_corridor_n3",
+      "to": "f0_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_corridor_n4",
+      "to": "f0_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_stairs_core_west",
+      "to": "f0_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_lifts_core_center",
+      "to": "f0_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_stairs_core_east",
+      "to": "f0_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-01",
+      "to": "f1_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-02",
+      "to": "f1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-03",
+      "to": "f1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-04",
+      "to": "f1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-05",
+      "to": "f1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-06",
+      "to": "f1_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-07",
+      "to": "f1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-08",
+      "to": "f1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-09",
+      "to": "f1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_door_A-F1-10",
+      "to": "f1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_corridor_n1",
+      "to": "f1_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_corridor_n2",
+      "to": "f1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_corridor_n3",
+      "to": "f1_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_corridor_n4",
+      "to": "f1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_stairs_core_west",
+      "to": "f1_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_lifts_core_center",
+      "to": "f1_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_stairs_core_east",
+      "to": "f1_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-01",
+      "to": "f2_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-02",
+      "to": "f2_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-03",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0594,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-04",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0594,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-05",
+      "to": "f2_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-06",
+      "to": "f2_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-07",
+      "to": "f2_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-08",
+      "to": "f2_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-09",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0594,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-10",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0594,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-11",
+      "to": "f2_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_door_A-F2-12",
+      "to": "f2_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_corridor_n1",
+      "to": "f2_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_corridor_n2",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_corridor_n3",
+      "to": "f2_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_corridor_n4",
+      "to": "f2_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_stairs_core_west",
+      "to": "f2_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_lifts_core_center",
+      "to": "f2_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_stairs_core_east",
+      "to": "f2_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-01",
+      "to": "f3_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-02",
+      "to": "f3_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-03",
+      "to": "f3_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-04",
+      "to": "f3_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-05",
+      "to": "f3_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-06",
+      "to": "f3_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-07",
+      "to": "f3_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-08",
+      "to": "f3_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-09",
+      "to": "f3_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_door_A-F3-10",
+      "to": "f3_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_corridor_n1",
+      "to": "f3_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_corridor_n2",
+      "to": "f3_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_corridor_n3",
+      "to": "f3_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_corridor_n4",
+      "to": "f3_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_stairs_core_west",
+      "to": "f3_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_lifts_core_center",
+      "to": "f3_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_stairs_core_east",
+      "to": "f3_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-01",
+      "to": "f4_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-02",
+      "to": "f4_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-03",
+      "to": "f4_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-04",
+      "to": "f4_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-05",
+      "to": "f4_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-06",
+      "to": "f4_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-07",
+      "to": "f4_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-08",
+      "to": "f4_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-09",
+      "to": "f4_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_door_A-F4-10",
+      "to": "f4_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_corridor_n1",
+      "to": "f4_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_corridor_n2",
+      "to": "f4_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_corridor_n3",
+      "to": "f4_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_corridor_n4",
+      "to": "f4_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_stairs_core_west",
+      "to": "f4_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_lifts_core_center",
+      "to": "f4_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_stairs_core_east",
+      "to": "f4_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-01",
+      "to": "f5_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-02",
+      "to": "f5_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-03",
+      "to": "f5_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-04",
+      "to": "f5_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-05",
+      "to": "f5_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-06",
+      "to": "f5_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-07",
+      "to": "f5_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-08",
+      "to": "f5_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-09",
+      "to": "f5_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_door_A-F5-10",
+      "to": "f5_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 3.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_corridor_n1",
+      "to": "f5_corridor_n2",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_corridor_n2",
+      "to": "f5_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_corridor_n3",
+      "to": "f5_corridor_n4",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_corridor_n4",
+      "to": "f5_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 12.0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_stairs_core_west",
+      "to": "f5_corridor_n1",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_lifts_core_center",
+      "to": "f5_corridor_n3",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f5_stairs_core_east",
+      "to": "f5_corridor_n5",
+      "mode": "corridor",
+      "distance_m": 0,
+      "floor_delta": 0,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_stairs_core_west",
+      "to": "f0_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_stairs_core_east",
+      "to": "f0_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f-1_lifts_core_center",
+      "to": "f0_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_stairs_core_west",
+      "to": "f1_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_stairs_core_east",
+      "to": "f1_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f0_lifts_core_center",
+      "to": "f1_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_stairs_core_west",
+      "to": "f2_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_stairs_core_east",
+      "to": "f2_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f1_lifts_core_center",
+      "to": "f2_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_stairs_core_west",
+      "to": "f3_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_stairs_core_east",
+      "to": "f3_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f2_lifts_core_center",
+      "to": "f3_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_stairs_core_west",
+      "to": "f4_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_stairs_core_east",
+      "to": "f4_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f3_lifts_core_center",
+      "to": "f4_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_stairs_core_west",
+      "to": "f5_stairs_core_west",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_stairs_core_east",
+      "to": "f5_stairs_core_east",
+      "mode": "stairs",
+      "distance_m": 12,
+      "floor_delta": 1,
+      "wait_seconds": 0,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    },
+    {
+      "from": "f4_lifts_core_center",
+      "to": "f5_lifts_core_center",
+      "mode": "lift",
+      "distance_m": 8,
+      "floor_delta": 1,
+      "wait_seconds": 20,
+      "bidirectional": true,
+      "provenance": "SYNTHETIC"
+    }
+  ]
+}

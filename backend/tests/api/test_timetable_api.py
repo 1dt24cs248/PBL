@@ -99,7 +99,7 @@ def test_holiday_date_metadata_and_room_availability(m2_client):
     assert availability.status_code == 200
     assert availability.json()["term_code"] == "2026-27-ODD"
     meta = m2_client.get("/meta/data-status", headers=headers)
-    assert meta.status_code == 200 and meta.json()["counts"]["sessions"] == 463
+    assert meta.status_code == 200 and meta.json()["counts"]["sessions"] == 475
     conflicts = m2_client.get("/timetable/conflicts?term=2026-27-ODD", headers=headers)
     assert conflicts.status_code == 200
     assert any(item["type"] == "room" for item in conflicts.json()["conflicts"])

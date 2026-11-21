@@ -249,28 +249,29 @@ def _make_sessions(term_code: str, section_code: str, day: str, start: int, end:
                  "room_id": None, "room_required": False,
                  "block_id": block_id, "provenance": "REAL_DSATM_PDF", "room_inferred": False}]
 
-    parallel = re.search(r"B1:\s*(.*?)(?=\s*/\s*B2:)", label, re.I)
-    if parallel:
-        b2 = re.search(r"/\s*B2:\s*(.*?)(?:\)|$)", label, re.I)
-        if b2:
-            branches = [("B1", parallel.group(1)), ("B2", b2.group(1))]
-            made = []
-            for batch, branch in branches:
-                room_match = ROOM_AT_RE.search(branch)
-                room_id = resolve_room(room_match.group(1)) if room_match else None
-                inferred = False
-                if room_id is None:
-                    room_id = _parallel_room(term_code, label, batch)
-                    inferred = bool(room_id)
-                subject_code, subject_name = _parallel_subject(term_code, label, room_id, catalog)
-                initials = re.findall(r"[A-Z]{2,4}", branch.split("@")[0])
-                made.append({"batch": batch, "subject_code": subject_code, "subject_name": subject_name,
-                             "faculty_initials": initials,
-                             "room_id": room_id, "room_required": True,
-                             "block_id": block_id, "provenance": "INFERRED" if inferred else "REAL_DSATM_PDF",
-                             "room_inferred": inferred})
-            if made:
-                return made
+    # Source rows can list B1 or B2 first. Parse both branch markers in source
+    # order instead of assuming B1 precedes B2 (5C Thu lists B2 first).
+    branches = re.findall(
+        r"\b(B[12]):\s*(.*?)(?=\s*/\s*B[12]:|\)|$)", label, re.I
+    )
+    if len(branches) == 2 and {batch.upper() for batch, _ in branches} == {"B1", "B2"}:
+        made = []
+        for batch, branch in branches:
+            batch = batch.upper()
+            room_match = ROOM_AT_RE.search(branch)
+            room_id = resolve_room(room_match.group(1)) if room_match else None
+            inferred = False
+            if room_id is None:
+                room_id = _parallel_room(term_code, label, batch)
+                inferred = bool(room_id)
+            subject_code, subject_name = _parallel_subject(term_code, label, room_id, catalog)
+            initials = re.findall(r"[A-Z]{2,4}", branch.split("@")[0])
+            made.append({"batch": batch, "subject_code": subject_code, "subject_name": subject_name,
+                         "faculty_initials": initials,
+                         "room_id": room_id, "room_required": True,
+                         "block_id": block_id, "provenance": "INFERRED" if inferred else "REAL_DSATM_PDF",
+                         "room_inferred": inferred})
+        return made
 
     room_match = ROOM_AT_RE.search(label)
     room_id = resolve_room(room_match.group(1)) if room_match else None

@@ -9,7 +9,7 @@ def test_all_timetable_terms_parse_and_stay_a_block_only():
         "2026-27-ODD", "2025-26-ODD", "2024-25-EVEN"
     }
     assert Counter(session["term_code"] for session in parsed.sessions) == {
-        "2026-27-ODD": 171, "2025-26-ODD": 177, "2024-25-EVEN": 115
+        "2026-27-ODD": 177, "2025-26-ODD": 183, "2024-25-EVEN": 115
     }
     assert all(not (session["room_id"] or "").startswith("B-") for session in parsed.sessions)
     assert parsed.excluded_b_block_labs == 10
@@ -56,3 +56,27 @@ def test_batch_parallelism_allowed_and_real_conflicts_remain_reportable():
     assert parsed.conflicts
     assert {item["type"] for item in parsed.conflicts} == {"room", "faculty"}
     assert all(item["type"] in {"room", "faculty", "section"} for item in parsed.conflicts)
+
+
+def test_5c_thursday_reverse_batch_order_preserves_both_explicit_rooms():
+    parsed = parse_timetables()
+    c_thursday = [row for row in parsed.sessions if row["term_code"] == "2026-27-ODD"
+                  and row["section_code"] == "C" and row["day"] == "Thu"
+                  and row["start_period"] == 1]
+    by_batch = {row["batch"]: row for row in c_thursday}
+    assert set(by_batch) == {"B1", "B2"}
+    assert by_batch["B1"]["room_id"] == "A-F2-06"  # explicit 206
+    assert by_batch["B2"]["room_id"] == "A-F2-10"  # explicit 210
+    assert by_batch["B1"]["block_id"] == by_batch["B2"]["block_id"]
+    assert all(not row["room_inferred"] for row in by_batch.values())
+
+    # 5F explicitly labels the same canonical room as 211; 211 aliases 210.
+    # Only the B2 branch (210/A-F2-10) clashes, never B1 (206/A-F2-06).
+    conflicts = [item for item in parsed.conflicts if item["term_code"] == "2026-27-ODD"
+                 and item["day"] == "Thu" and item["period"] in (1, 2)
+                 and item["type"] == "room"]
+    assert len(conflicts) == 2
+    for conflict in conflicts:
+        first, second = (parsed.sessions[index] for index in conflict["session_indices"])
+        assert {first["section_code"], second["section_code"]} == {"C", "F"}
+        assert "B2:" in next(row for row in (first, second) if row["section_code"] == "C")["raw_label"]
