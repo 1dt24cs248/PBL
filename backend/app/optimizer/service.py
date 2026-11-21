@@ -65,11 +65,15 @@ def _conflicts(sessions: list[dict]) -> tuple[list[dict], Counter]:
     return conflicts, Counter(c["type"] for c in conflicts)
 
 
-def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
+def solve_energy(db: Session, term: AcademicTerm, request, *, energy_weight: float = 1.0) -> dict:
     started = perf_counter()
     sessions, rooms, strengths = _session_data(db, term)
     forbidden_floors = set(request.forbid_floors)
     forbidden_rooms = set(request.forbid_rooms)
+    closed_floors = set(getattr(request, "close_floors", []))
+    closed_rooms = set(getattr(request, "close_rooms", []))
+    blocked_floors = forbidden_floors | closed_floors
+    blocked_rooms = forbidden_rooms | closed_rooms
     room_by_key = {r["room_id"]: r for r in rooms}
     selected_sections = set(request.sections)
     def selected(row: dict) -> bool:
@@ -80,7 +84,16 @@ def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
         if request.movable == "selected_sections":
             return row["section_code"] in selected_sections
         return row["room_inferred"]
-    movable = {row["id"] for row in sessions if selected(row) and (not row["is_lab"] or not request.lock_labs)}
+    closure_sessions = {row["id"] for row in sessions if row["room_required"] and row["room_id"] and
+                        (row["room_id"] in closed_rooms or room_by_key.get(row["room_id"], {}).get("floor") in closed_floors)}
+    closure_active = bool(closed_floors or closed_rooms)
+    if closure_active:
+        # A closure scenario is an isolated what-if: sessions in affected
+        # resources must leave, and every other session remains fixed.
+        movable = {row["id"] for row in sessions if row["id"] in closure_sessions
+                   and (not row["is_lab"] or not request.lock_labs)}
+    else:
+        movable = {row["id"] for row in sessions if selected(row) and (not row["is_lab"] or not request.lock_labs)}
     model = cp_model.CpModel()
     candidates: dict[tuple[int, str], cp_model.IntVar] = {}
     relocations: dict[int, cp_model.IntVar] = {}
@@ -88,6 +101,10 @@ def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
     slots_for_room: dict[tuple[str, str, int], list] = defaultdict(list)
     room_on: dict[tuple[str, str, int], cp_model.IntVar] = {}
     infeasible_reasons = []
+    locked_closures = [row for row in sessions if row["id"] in closure_sessions and row["is_lab"] and request.lock_labs]
+    if locked_closures:
+        infeasible_reasons.append("closed room/floor contains locked lab sessions: " + ", ".join(str(row["id"]) for row in locked_closures))
+        model.Add(0 == 1)
     for row in sessions:
         if row["id"] not in movable:
             continue
@@ -99,7 +116,7 @@ def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
             is_lab_room = "lab" in rtype or "computer" in rtype
             if not room["timetable_eligible"] or room["status"] != "available":
                 continue
-            if room["floor"] in forbidden_floors or room["room_id"] in forbidden_rooms:
+            if room["floor"] in blocked_floors or room["room_id"] in blocked_rooms:
                 continue
             if row["is_lab"] and not is_lab_room:
                 continue
@@ -175,7 +192,7 @@ def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
     objective = []
     for (rid, _day, _period), on in room_ons.items():
         kw = room_by_key[rid]["connected_kw"]
-        coefficient = round(kw * settings.period_hours * settings.energy_tariff_inr_per_kwh * scale)
+        coefficient = round(energy_weight * kw * settings.period_hours * settings.energy_tariff_inr_per_kwh * scale)
         if coefficient:
             objective.append(coefficient * on)
     for sid, changed in relocations.items():
@@ -231,7 +248,7 @@ def solve_energy(db: Session, term: AcademicTerm, request) -> dict:
     solver_objective = solver.ObjectiveValue() / scale if status_code in (cp_model.OPTIMAL, cp_model.FEASIBLE) else None
     validator = validate_assignment(sessions, rooms, assignments, movable_ids=movable,
         section_strengths=strengths, max_relocations=request.max_relocations,
-        forbid_floors=forbidden_floors, forbid_rooms=forbidden_rooms, lock_labs=request.lock_labs)
+        forbid_floors=blocked_floors, forbid_rooms=blocked_rooms, lock_labs=request.lock_labs)
     if status_code in (cp_model.OPTIMAL, cp_model.FEASIBLE) and not validator["valid"]:
         status_name = "MODEL_INVALID"
     return {"id": str(uuid.uuid4()), "status": "draft", "term_code": term.code,

@@ -22,6 +22,8 @@ class EnergyRequest(BaseModel):
     lock_labs: bool = True
     forbid_floors: list[int] = Field(default_factory=list)
     forbid_rooms: list[str] = Field(default_factory=list)
+    close_floors: list[int] = Field(default_factory=list)
+    close_rooms: list[str] = Field(default_factory=list)
     lambda_move: float = Field(default=1.0, ge=0)
     lambda_floor: float = Field(default=0.0, ge=0)
     time_limit_s: int = Field(default=30, gt=0, le=3600)
@@ -41,13 +43,14 @@ def optimize_energy(body: EnergyRequest, db: Session = Depends(get_db),
     if term is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Term not found")
     canonical_rooms = []
-    for token in body.forbid_rooms:
+    for token in body.forbid_rooms + body.close_rooms:
         canonical = resolve_room(token)
         if canonical is None:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown A-Block room: {token}")
         canonical_rooms.append(canonical)
-    if canonical_rooms != body.forbid_rooms:
-        body = body.model_copy(update={"forbid_rooms": canonical_rooms})
+    if canonical_rooms:
+        body = body.model_copy(update={"forbid_rooms": canonical_rooms[:len(body.forbid_rooms)],
+                                       "close_rooms": canonical_rooms[len(body.forbid_rooms):]})
     payload = solve_energy(db, term, body)
     proposal = OptimizerProposal(id=payload["id"], term_id=term.id, status="draft",
                                  payload=payload, created_by=user.id, provenance="SYNTHETIC")
