@@ -1,11 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
+from app.models import User
 from app.seed import DEV_PASSWORD, seed
 
 
@@ -16,6 +17,7 @@ def nav_client():
     SessionLocal = sessionmaker(bind=engine, autoflush=False)
     with SessionLocal() as db:
         seed(db)
+        student_username = db.scalar(select(User.username).where(User.role == "student").order_by(User.username))
 
     def override():
         db = SessionLocal()
@@ -26,6 +28,7 @@ def nav_client():
 
     app.dependency_overrides[get_db] = override
     client = TestClient(app)
+    client.student_username = student_username
     yield client
     app.dependency_overrides.clear()
     engine.dispose()
@@ -41,7 +44,7 @@ def test_all_authenticated_roles_can_read_floorplans_and_anonymous_is_401(nav_cl
     assert nav_client.get("/floorplan").status_code == 401
     assert nav_client.get("/floorplan/1").status_code == 401
     assert nav_client.get("/nav/route?from=101&to=102&mode=stairs").status_code == 401
-    for username in ("1DT24CS248", "fac1", "hod_cse", "admin1", "maint1"):
+    for username in (nav_client.student_username, "fac1", "hod_cse", "admin1", "maint1"):
         headers = auth(nav_client, username)
         floors = nav_client.get("/floorplan", headers=headers)
         assert floors.status_code == 200

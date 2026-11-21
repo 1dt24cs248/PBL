@@ -479,6 +479,7 @@ def import_timetables(db: Session, path: Path = SPEC_PATH) -> str:
                                    subject_id=subject.id if subject else None,
                                    faculty_id=faculty_ids[0] if faculty_ids else None,
                                    room_id=room.id if room else None, room_required=row["room_required"],
+                                   room_inferred=row.get("room_inferred", False),
                                    raw_label=row["raw_label"], block_id=row["block_id"],
                                    provenance=row["provenance"], version=1)
         db.add(session)

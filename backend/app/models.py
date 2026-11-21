@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Date, Float, ForeignKey, Integer, JSON, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -192,6 +192,7 @@ class TimetableSession(Base):
     faculty_id: Mapped[int | None] = mapped_column(ForeignKey("faculty.id"), nullable=True, index=True)
     room_id: Mapped[int | None] = mapped_column(ForeignKey("rooms.id"), nullable=True, index=True)
     room_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    room_inferred: Mapped[bool] = mapped_column(Boolean, default=False)
     raw_label: Mapped[str] = mapped_column(String(500))
     block_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
@@ -205,6 +206,16 @@ class TimetableSessionFaculty(Base):
     session_id: Mapped[int] = mapped_column(ForeignKey("timetable_sessions.id", ondelete="CASCADE"), index=True)
     faculty_id: Mapped[int] = mapped_column(ForeignKey("faculty.id", ondelete="CASCADE"), index=True)
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
+
+
+class OptimizerProposal(Base):
+    __tablename__ = "optimizer_proposals"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    term_id: Mapped[int] = mapped_column(ForeignKey("academic_terms.id", ondelete="CASCADE"), index=True)
+    status: Mapped[str] = mapped_column(String(20), default="draft", index=True)
+    payload: Mapped[dict] = mapped_column(JSON)
+    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    provenance: Mapped[str] = mapped_column(String(20), default="SYNTHETIC")
 
 
 class NavNode(Base):

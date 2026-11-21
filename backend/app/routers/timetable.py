@@ -383,6 +383,8 @@ def update_session(session_id: int, body: TimetableSessionPatch, db: Session = D
     row.day, row.batch = mapped["day"], mapped["batch"]
     row.start_period, row.end_period = min(mapped["periods"]), max(mapped["periods"])
     row.room_required, row.raw_label, row.block_id = mapped["room_required"], mapped["raw_label"], mapped["block_id"]
+    if "room_id" in changes:
+        row.room_inferred = False
     row.provenance = "SYNTHETIC"
     row.version += 1
     db.query(TimetableSessionFaculty).filter(TimetableSessionFaculty.session_id == row.id).delete()

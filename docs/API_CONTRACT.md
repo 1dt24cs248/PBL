@@ -340,7 +340,7 @@ An infeasible solve returns a persisted draft with `solver_status: "INFEASIBLE"`
 `POST /proposals/{proposal_id}/submit`, `/approve`, `/reject`, and `/apply` use an empty JSON object `{}`. Admin may submit, reject, and apply. Admin may approve any proposal; HOD may approve only if every affected section belongs to their department. All authenticated roles may list and inspect proposals with `GET /proposals` and `GET /proposals/{proposal_id}`; student and maintenance roster restrictions remain in effect and proposal responses contain no student names or USNs. Submit moves a draft to submitted, approve moves it to approved, reject moves it to rejected, and apply moves an approved proposal to applied. Rejected/discarded proposals do not change timetable rows. Apply atomically checks the stored expected version of every changed session and source/destination room, updates room assignments and increments each changed session version; a stale version returns `409` and rolls back all changes.
 
 ```json
-{"id":"proposal-uuid","status":"submitted","term_code":"2026-27-ODD"}
+{"id":"proposal-uuid","status":"submitted","term_code":"2026-27-ODD","data_status":"SYNTHETIC"}
 ```
 
 `GET /proposals` returns `[{"id":"proposal-uuid","status":"draft","term_code":"2026-27-ODD","solver_status":"OPTIMAL","data_status":"SYNTHETIC"}]`. `GET /proposals/{proposal_id}` returns the full optimizer response above plus workflow status. Unknown proposal IDs return `404`.

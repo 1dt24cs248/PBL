@@ -111,7 +111,13 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
             mapping.admin_editable = True
             mapping.provenance = "INFERRED"
     students_by_usn = {student.usn: student for student in db.scalars(select(Student).where(Student.usn.is_not(None)))}
-    for usn in (value.strip() for value in settings.demo_student_usns.split(",") if value.strip()):
+    configured_demo_usns = [value.strip() for value in settings.demo_student_usns.split(",") if value.strip()]
+    if not configured_demo_usns:
+        known_usns = sorted(value for value in students_by_usn if value)
+        # Preserve the prior five-account development selection without
+        # checking personal identifiers into source control.
+        configured_demo_usns = known_usns[:4] + known_usns[247:248]
+    for usn in configured_demo_usns:
         student = students_by_usn.get(usn)
         if student is None:
             raise ValueError(f"Configured demo student USN is absent from dataset: {usn}")

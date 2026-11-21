@@ -30,7 +30,7 @@ def test_dataset_parser_and_seed_counts(tmp_path):
         assert db.query(RoomAlias).count() == len(dataset.aliases)
         assert "A-F2-11" in report and "A-F2-12" in report
         assert "1DT24CS" not in report and "24UGDT" not in report
-        assert "SHAILENDRA KUMAR N" not in report
+        assert all(student["full_name"].casefold() not in report.casefold() for student in dataset.students)
         # The seed is safe to rerun and keeps IDs / counts stable.
         seed(db, dataset)
         assert db.query(Room).count() == 66
@@ -41,9 +41,8 @@ def test_dataset_parser_and_seed_counts(tmp_path):
 def test_roster_addendum_and_admission_numbers_are_not_usns():
     dataset = parse_dataset()
     by_usn = {student["usn"]: student for student in dataset.students if student["usn"]}
-    assert {"1DT24CS198", "1DT24CS239", "1DT24CS272"}.issubset(by_usn)
+    assert len(by_usn) == 342
     admission_rows = [student for student in dataset.students if student["usn"] is None]
-    assert {student["source_identifier"] for student in admission_rows} == {
-        "24UGDT1805-CS1", "24UGDT0186-CS1"
-    }
+    assert len(admission_rows) == 2
+    assert all(student["source_identifier"].startswith("24UGDT") for student in admission_rows)
     assert all(student["provenance"] == "REAL_DSATM_PDF" for student in dataset.students)
