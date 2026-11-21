@@ -407,8 +407,10 @@ Every session returned by section, student, faculty, room, and date timetable en
 Existing `faculty_name`, `room_id`, `provenance`, and all other response fields remain unchanged. Activity subjects include NPTEL/MOOC, PRE-PLACEMENT, NSS/YOGA, and Skill Dev; lab batches and lab subjects use `Lab`; other sessions use `Lecture`. Sessions sharing one multi-period block retain the same `block_id`.
 
 ```json
-{"id":501,"term_code":"2026-27-ODD","section_code":"E","batch":"ALL","day":"Wed","periods":[1,2],"subject_code":"BCS502","subject_name":"Machine Learning","faculty_id":31,"faculty_initials":"PP","faculty_name":"Parvathisha Pudugosala","faculty_names":["Parvathisha Pudugosala"],"faculty_details":[{"name":"Parvathisha Pudugosala","data_status":"REAL_DSATM_PDF"}],"room_id":"A-F2-02","room_real_label":"Classroom 02","room_inferred":true,"room_required":true,"raw_label":"5TH E SECTION; P1-P2 ML (PP)","block_id":"2026-27-ODD-E-WED-P1-P2-1","session_type":"Lecture","start_time":"09:30","end_time":"11:20","provenance":"REAL_DSATM_PDF","version":1}
+{"id":501,"term_code":"2026-27-ODD","section_code":"E","batch":"ALL","day":"Wed","periods":[1,2],"subject_code":"BCS502","subject_name":"Machine Learning","faculty_id":31,"faculty_initials":"PP","faculty_name":"Mr. Parvathisha Pudugosola","faculty_names":["Mr. Parvathisha Pudugosola"],"faculty_details":[{"name":"Mr. Parvathisha Pudugosola","data_status":"REAL_DSATM_PDF"}],"room_id":"A-F2-02","room_real_label":"Classroom 02","room_inferred":true,"room_required":true,"raw_label":"5TH E SECTION; P1-P2 ML (PP)","block_id":"2026-27-ODD-E-WED-P1-P2-1","session_type":"Lecture","start_time":"09:30","end_time":"11:20","provenance":"REAL_DSATM_PDF","version":1}
 ```
+
+For the CS-5-E Tuesday ERP display only, TOC is displayed as `Ms. Swathi A`, the P3-P4 B1 lab includes `Ashalatha N S` with `data_status: "REAL_ERP_SCREENSHOT"`, P6 ML is displayed as `Mr. Parvathisha Pudugosula`, and P7 EVS as `Dr. Deepak GB`. Canonical faculty records are unchanged.
 
 ### `GET /meta/periods`
 
