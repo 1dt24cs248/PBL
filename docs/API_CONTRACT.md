@@ -288,7 +288,7 @@ Admin and HOD may read this report. Maintenance is denied. Occupancy percentage 
 
 ### `POST /optimizer/energy`
 
-Admin only. Creates and returns a draft proposal; it does not modify official timetable sessions. `movable` is `inferred_only` (default when omitted), `all`, or `selected_sections`; `sections` is a list of section codes used for `selected_sections`. `max_relocations` is null or a nonnegative integer; `lock_labs` defaults true; `forbid_floors` is a list of integer floor numbers; `forbid_rooms` is a list of canonical room IDs; `lambda_move` and `lambda_floor` are nonnegative objective weights; `time_limit_s` defaults to 30; `seed` defaults to 0.
+Admin only. Creates and returns a draft proposal; it does not modify official timetable sessions. `movable` is `inferred_only` (default when omitted), `all`, or `selected_sections`; `sections` is a list of section codes used for `selected_sections`. `max_relocations` is null or a nonnegative integer; `lock_labs` defaults true; `forbid_floors` is a list of integer floor numbers; `forbid_rooms` is a list of canonical room IDs; `close_floors` and `close_rooms` are optional additive fields, defaulting to empty lists. When a closure is supplied, every room-required session currently assigned there must leave; every other session stays fixed. Closed resources are forbidden as destinations. A lab session remains locked when `lock_labs` is true; if a closure requires moving such a lab, the solve returns `INFEASIBLE` with `infeasible_reason`. `lambda_move` and `lambda_floor` are nonnegative objective weights; `time_limit_s` defaults to 30; `seed` defaults to 0.
 
 ```json
 {
@@ -299,6 +299,8 @@ Admin only. Creates and returns a draft proposal; it does not modify official ti
   "lock_labs":true,
   "forbid_floors":[5],
   "forbid_rooms":["A-F2-11"],
+  "close_floors":[],
+  "close_rooms":[],
   "lambda_move":1.0,
   "lambda_floor":0.25,
   "time_limit_s":30,

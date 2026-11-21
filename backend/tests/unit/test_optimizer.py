@@ -7,11 +7,13 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base
 from app.models import (AcademicTerm, Room, Student, TimetableSection,
-                        TimetableSession)
-from app.optimizer.service import solve_energy
+                        TimetableSession, TimetableSubject)
+from app.optimizer.service import _session_data, solve_energy
 from app.optimizer.validator import validate_assignment
 from app.routers.optimizer import EnergyRequest
 from app.seed import seed
+from app.experiments.energy import _greedy_first_fit, _relocations_extra, _write_csv
+import csv
 
 
 def optimizer_db():
@@ -29,7 +31,7 @@ def optimizer_db():
                            provenance="SYNTHETIC"))
     section_rows = {row.code: row for row in db.scalars(select(TimetableSection).where(TimetableSection.term_id == term.id))}
     room_rows = {row.number: row for row in db.scalars(select(Room))}
-    allowed = {"A-F1-01": 60, "A-F1-02": 30, "A-F1-03": 60}
+    allowed = {"A-F1-01": 60, "A-F1-02": 30, "A-F1-03": 60, "A-F2-02": 60}
     for room in room_rows.values():
         room.timetable_eligible = room.number in allowed
         room.status = "available"
@@ -119,3 +121,64 @@ def test_independent_validator_rejects_corrupted_assignments():
         section_strengths={"A": 50, "B": 10}, forbid_floors={1})
     kinds = {row["type"] for row in result["violations"]}
     assert {"capacity", "room_double_booking", "forbidden_room"}.issubset(kinds)
+
+
+def test_closing_room_moves_explicit_session_and_locked_lab_is_infeasible():
+    engine, db, term, room_rows = optimizer_db()
+    try:
+        db.add(Student(full_name="Synthetic optimizer test record", division_code="CSE-3", provenance="SYNTHETIC"))
+        # Existing explicit session belongs to section C; add one roster entry so
+        # its capacity is known to the optimizer.
+        lab = TimetableSubject(term_id=term.id, code="LABTEST", name="SYNTHETIC LAB", provenance="SYNTHETIC")
+        db.add(lab)
+        db.flush()
+        section_c = db.scalar(select(TimetableSection).where(TimetableSection.term_id == term.id, TimetableSection.code == "C"))
+        room_rows["A-F2-02"].room_type = "computer lab"
+        lab_session = TimetableSession(term_id=term.id, section_id=section_c.id, batch="ALL", day="Tue",
+            start_period=2, end_period=2, subject_id=lab.id, room_id=room_rows["A-F2-02"].id,
+            room_required=True, room_inferred=False, raw_label="SYNTHETIC LAB")
+        db.add(lab_session)
+        db.commit()
+        fixed_id = db.scalar(select(TimetableSession.id).where(TimetableSession.term_id == term.id,
+            TimetableSession.room_id == room_rows["A-F1-03"].id, TimetableSession.raw_label == "synthetic fixed session"))
+        moved = solve_energy(db, term, EnergyRequest(term=term.code, close_rooms=["A-F1-03"], lambda_move=0))
+        assert moved["solver_status"] == "OPTIMAL"
+        assert any(change["from_room"] == "A-F1-03" and change["to_room"] != "A-F1-03" for change in moved["changes"])
+        assert {change["session_id"] for change in moved["changes"]} == {fixed_id}
+        locked = solve_energy(db, term, EnergyRequest(term=term.code, close_rooms=["A-F2-02"], lock_labs=True))
+        assert locked["solver_status"] == "INFEASIBLE"
+        assert "locked lab" in locked["infeasible_reason"]
+    finally:
+        db.close()
+        engine.dispose()
+
+
+def test_greedy_and_both_cp_sat_strategies_validate_and_greedy_is_deterministic():
+    engine, db, term, _rooms = optimizer_db()
+    try:
+        sessions, rooms, strengths = _session_data(db, term)
+        movable = {s["id"] for s in sessions if s["room_inferred"] and not s["is_lab"]}
+        greedy_a = _greedy_first_fit(sessions, rooms, movable, strengths)
+        greedy_b = _greedy_first_fit(sessions, rooms, movable, strengths)
+        assert greedy_a == greedy_b
+        assert validate_assignment(sessions, rooms, greedy_a, movable_ids=movable, section_strengths=strengths)["valid"]
+        for energy_weight in (0, 1):
+            result = solve_energy(db, term, EnergyRequest(term=term.code, lambda_move=1, lambda_floor=0), energy_weight=energy_weight)
+            assignments = {s["id"]: s["room_id"] for s in sessions if s["room_required"]}
+            assignments.update({row["session_id"]: row["to_room"] for row in result["changes"]})
+            assert result["solver_status"] in {"OPTIMAL", "FEASIBLE"}
+            assert validate_assignment(sessions, rooms, assignments, movable_ids=movable, section_strengths=strengths)["valid"]
+    finally:
+        db.close()
+        engine.dispose()
+
+
+def test_experiment_incremental_relocations_and_csv_column_counts(tmp_path):
+    assert _relocations_extra(8, 5) == 3
+    assert _relocations_extra(4, 5) == -1
+    assert _relocations_extra(8, 5) >= 0
+    path = tmp_path / "widths.csv"
+    _write_csv(path, [{"lambda_move": 0.0, "max_relocations": 0, "a": 1}], ["lambda_move", "max_relocations", "a", "b"])
+    with path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.reader(handle))
+    assert all(len(row) == len(rows[0]) == 4 for row in rows)
