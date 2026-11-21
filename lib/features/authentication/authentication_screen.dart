@@ -50,15 +50,18 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
 
   Future<void> login(String username, String password) async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+    try {
       final response = await _api.dio.post<Map<String, dynamic>>(
         '/auth/login',
         data: {'username': username, 'password': password},
       );
       final data = response.data!;
       await _storage.writeToken(data['access_token'] as String);
-      return _loadMe();
-    });
+      state = AsyncData(await _loadMe());
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> logout() async {
@@ -105,15 +108,17 @@ class _AuthenticationScreenState extends ConsumerState<AuthenticationScreen> {
       final data = error.response?.data;
       final detail = data is Map<String, dynamic>
           ? data['detail']?.toString()
-          : null;
+          : data is String && data.isNotEmpty
+          ? data
+          : error.message;
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(detail ?? 'Login failed')));
       }
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Login failed')));
+            .showSnackBar(SnackBar(content: Text('Login failed: $error')));
       }
     }
   }

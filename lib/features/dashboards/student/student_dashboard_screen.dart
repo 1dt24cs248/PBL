@@ -56,6 +56,16 @@ class StudentDashboardScreen extends ConsumerWidget {
                     onTap: () => context.go('/student/timetable'),
                   ),
                 ),
+                const SizedBox(height: 8),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.meeting_room_outlined),
+                    title: const Text('Room Availability Finder'),
+                    subtitle: const Text('Find available rooms'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/rooms/availability'),
+                  ),
+                ),
               ],
             ),
     );
