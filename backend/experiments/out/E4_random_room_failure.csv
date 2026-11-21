@@ -1,0 +1,5 @@
+k_rooms_unavailable,runs,feasibility_rate,mean_relocations,mean_extra_students_affected,mean_solve_time_s
+1,5,1.0,38.0,0.0,0.1744346
+2,5,1.0,48.8,35.2,0.1742698
+3,5,1.0,48.8,35.2,0.21341359999999998
+5,5,1.0,59.0,70.8,0.19487480000000001

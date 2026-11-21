@@ -1,0 +1,57 @@
+{
+  "git_commit_hash": "901cdbe80b447167a208a4aca3eb664c547b2075",
+  "ortools_version": "9.12.4544",
+  "python_version": "3.11.0",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "settings": {
+    "period_hours": 0.9166666666666666,
+    "standby_fraction": 0.0,
+    "periods_per_day": 7,
+    "tariff_inr_per_kwh": 8.5,
+    "lambda_move_grid": [
+      0.0,
+      0.1,
+      0.5,
+      1.0,
+      5.0
+    ],
+    "max_relocations_grid": [
+      0,
+      5,
+      10,
+      20,
+      null
+    ],
+    "floor_scenarios": [
+      [
+        5
+      ],
+      [
+        4
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "time_limit_s": 30,
+    "num_workers": 1
+  },
+  "term": "2026-27-ODD",
+  "data_status_notes": [
+    "Synthetic equipment wattages and tariff.",
+    "Imported and inferred timetable room assignments; source conflicts remain reported.",
+    "No real DSATM meter readings are available."
+  ],
+  "timestamp_utc": "2026-11-21T12:12:27.672709+00:00"
+}

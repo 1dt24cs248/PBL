@@ -1,0 +1,21 @@
+seed,forbid_floors,feasibility,relocations,kwh_change,unresolvable_reason,solver_status,solve_time_s
+0,[5],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.247357
+1,[5],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.165775
+2,[5],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.179248
+3,[5],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.186104
+4,[5],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.155344
+0,[4],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.247779
+1,[4],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.19896
+2,[4],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.159317
+3,[4],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.164921
+4,[4],True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.161327
+0,"[4, 5]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.159957
+1,"[4, 5]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.120256
+2,"[4, 5]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.123528
+3,"[4, 5]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.134111
+4,"[4, 5]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.118282
+0,"[5, 3]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.125475
+1,"[5, 3]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.160917
+2,"[5, 3]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.124906
+3,"[5, 3]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.159574
+4,"[5, 3]",True,38,25.437499000000003,fixed_source_clashes=6,OPTIMAL,0.138284
