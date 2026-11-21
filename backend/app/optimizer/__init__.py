@@ -1,0 +1,1 @@
+"""Deterministic timetable energy optimizer."""

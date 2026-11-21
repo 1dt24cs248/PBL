@@ -154,7 +154,11 @@ def _parse_students(text: str) -> tuple[list[dict], list[dict], list[str]]:
 
 def _parse_aliases(text: str) -> list[tuple[str, str, str]]:
     aliases = []
-    for line in text.splitlines():
+    # Only the dedicated room directory is authoritative for aliases. In
+    # particular, the Rooms CSV's notes column can mention nearby room labels
+    # and must never create resolver mappings.
+    directory = text.split("#### A. Rooms CSV", 1)[0]
+    for line in directory.splitlines():
         if "(alias " not in line:
             continue
         cells = line.split("|")
@@ -185,15 +189,16 @@ def _parse_aliases(text: str) -> list[tuple[str, str, str]]:
         for room_number in range(1, max_number + 1):
             token = str(floor * 100 + room_number)
             aliases.append((f"A-F{floor}-{room_number:02d}", token, "REAL_DSATM_PDF"))
-    # Explicit room aliases override the plain numeric pattern where the
-    # dataset maps 209/211 to the canonical shared room A-F2-10.
+    # Explicit aliases override numeric floor/room inference. 209 and 211 are
+    # separate physical rooms; notes on the F2-10 CSV row are not aliases.
     aliases.extend([
         ("A-G03", "SH1", "REAL_DSATM_PDF"), ("A-G10", "SH-2", "REAL_DSATM_PDF"),
         ("A-F2-06", "206", "REAL_DSATM_PDF"), ("A-F2-10", "210", "REAL_DSATM_PDF"),
         ("A-F3-05", "305", "REAL_DSATM_PDF"), ("A-F5-06", "506", "REAL_DSATM_PDF"),
         ("A-F5-02", "502", "REAL_DSATM_PDF"), ("A-F5-05", "505", "REAL_DSATM_PDF"),
         ("A-F4-09", "409", "INFERRED"), ("A-F2-05", "205", "REAL_DSATM_PDF"),
-        ("A-F2-10", "209", "REAL_DSATM_PDF"), ("A-F2-10", "211", "REAL_DSATM_PDF"),
+        ("A-F2-12", "209", "REAL_DSATM_PDF"), ("A-F2-12", "A-209", "REAL_DSATM_PDF"),
+        ("A-F2-11", "211", "REAL_DSATM_PDF"), ("A-F2-11", "A-211", "REAL_DSATM_PDF"),
     ])
     by_alias = {}
     for room_id, alias, provenance in aliases:

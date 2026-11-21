@@ -6,7 +6,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
-from app.models import AcademicTerm, Faculty, User
+from app.models import AcademicTerm, DivisionSectionMap, Faculty, Student, User
 from app.security import hash_password
 from app.seed import DEV_PASSWORD, seed
 
@@ -20,6 +20,11 @@ def m2_client():
         seed(db)
         term = db.scalar(select(AcademicTerm).where(AcademicTerm.code == "2026-27-ODD"))
         faculty = db.scalar(select(Faculty).where(Faculty.term_id == term.id, Faculty.initials == "PP"))
+        division = db.scalar(select(DivisionSectionMap).where(DivisionSectionMap.section_letter == "E"))
+        student = db.scalar(select(Student).where(Student.division_code == division.division_code,
+                                                  Student.lab_batch == "A1", Student.usn.is_not(None),
+                                                  Student.usn.in_(select(User.username).where(User.role == "student"))))
+        student_username = student.usn
         db.add(User(username="pp", full_name="Synthetic Faculty Test", password_hash=hash_password(DEV_PASSWORD),
                     role="teaching_faculty", department="CSE", provenance="SYNTHETIC"))
         db.commit()
@@ -35,6 +40,7 @@ def m2_client():
     app.dependency_overrides[get_db] = override
     client = TestClient(app)
     client.faculty_id = faculty_id
+    client.student_username = student_username
     yield client
     app.dependency_overrides.clear()
     engine.dispose()
@@ -47,7 +53,7 @@ def auth(client, username):
 
 
 def test_student_identity_and_fifth_e_regression(m2_client):
-    headers = auth(m2_client, "1DT24CS248")
+    headers = auth(m2_client, m2_client.student_username)
     me = m2_client.get("/students/me", headers=headers)
     assert me.status_code == 200
     assert (me.json()["division_code"], me.json()["section_code"], me.json()["lab_batch"]) == ("CSE-5", "E", "A1")
@@ -64,7 +70,7 @@ def test_student_identity_and_fifth_e_regression(m2_client):
 
 
 def test_sections_room_and_faculty_timetables(m2_client):
-    student_headers = auth(m2_client, "1DT24CS248")
+    student_headers = auth(m2_client, m2_client.student_username)
     own = m2_client.get("/sections/E/timetable?term=2026-27-ODD", headers=student_headers)
     assert own.status_code == 200
     other = m2_client.get("/sections/A/timetable?term=2026-27-ODD", headers=student_headers)
@@ -110,7 +116,7 @@ def test_session_writes_are_admin_only_versioned_and_conflict_checked(m2_client)
             "periods": [7], "subject_code": "BCS502", "room_id": "A-F4-03", "room_required": True,
             "raw_label": "manual test session", "block_id": "test-manual-block"}
     assert m2_client.post("/timetable/sessions", json=body,
-                          headers=auth(m2_client, "1DT24CS248")).status_code == 403
+                          headers=auth(m2_client, m2_client.student_username)).status_code == 403
     assert m2_client.post("/timetable/sessions", json=body,
                           headers=auth(m2_client, "hod_cse")).status_code == 403
     assert m2_client.post("/timetable/sessions", json=body,
@@ -134,7 +140,7 @@ def test_session_writes_are_admin_only_versioned_and_conflict_checked(m2_client)
 def test_role_and_authentication_boundaries(m2_client):
     assert m2_client.get("/students/me").status_code == 401
     assert m2_client.get("/timetable/student/me").status_code == 401
-    student = auth(m2_client, "1DT24CS248")
+    student = auth(m2_client, m2_client.student_username)
     assert m2_client.get("/admin/users", headers=student).status_code == 403
     maintenance = auth(m2_client, "maint1")
     assert m2_client.get("/students/me", headers=maintenance).status_code == 403

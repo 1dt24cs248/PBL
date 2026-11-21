@@ -70,13 +70,13 @@ def test_5c_thursday_reverse_batch_order_preserves_both_explicit_rooms():
     assert by_batch["B1"]["block_id"] == by_batch["B2"]["block_id"]
     assert all(not row["room_inferred"] for row in by_batch.values())
 
-    # 5F explicitly labels the same canonical room as 211; 211 aliases 210.
-    # Only the B2 branch (210/A-F2-10) clashes, never B1 (206/A-F2-06).
+    # The alias correction keeps 5F's explicit 211 room distinct from 5C's
+    # explicit 210 lab branch.
+    f_thursday = [row for row in parsed.sessions if row["term_code"] == "2026-27-ODD"
+                  and row["section_code"] == "F" and row["day"] == "Thu"
+                  and row["start_period"] == 1]
+    assert f_thursday and all(row["room_id"] == "A-F2-11" for row in f_thursday)
     conflicts = [item for item in parsed.conflicts if item["term_code"] == "2026-27-ODD"
                  and item["day"] == "Thu" and item["period"] in (1, 2)
                  and item["type"] == "room"]
-    assert len(conflicts) == 2
-    for conflict in conflicts:
-        first, second = (parsed.sessions[index] for index in conflict["session_indices"])
-        assert {first["section_code"], second["section_code"]} == {"C", "F"}
-        assert "B2:" in next(row for row in (first, second) if row["section_code"] == "C")["raw_label"]
+    assert not conflicts

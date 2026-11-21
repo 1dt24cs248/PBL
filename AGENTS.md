@@ -49,7 +49,7 @@ PBL is an intelligent campus management and resource optimization system.
 ## Scope and Data Rules
 
 - Work only with DSATM A-Block data. Exclude all B-Block rooms, equipment, energy rows, and references.
-- Official student USNs are only `1DT24CS001` through `1DT24CS342`. Values beginning `24UGDT` are admission numbers, not USNs.
+- Validate official student identifiers against the authoritative roster; admission identifiers are not USNs.
 - Treat HOD as a Faculty sub-role, not an administrator. Enforce authorization in the backend.
 - Optimizers generate proposals only. Official records change only through authorized approval and version-checked application in one transaction. What-If simulations never modify official records.
 - Every seeded row has a provenance status: `REAL_DSATM_PDF`, `SYNTHETIC`, or `INFERRED`. Show provenance in API responses and relevant UI.

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .routers import auth, floorplan, rooms, timetable
+from .routers import auth, energy, floorplan, optimizer, proposals, rooms, timetable
 
 
 @asynccontextmanager
@@ -15,6 +15,9 @@ app.include_router(auth.router)
 app.include_router(rooms.router)
 app.include_router(timetable.router)
 app.include_router(floorplan.router)
+app.include_router(energy.router)
+app.include_router(optimizer.router)
+app.include_router(proposals.router)
 
 
 @app.get("/health")
