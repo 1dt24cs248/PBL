@@ -27,6 +27,18 @@ class HodDashboardScreen extends StatelessWidget {
         route: '/energy',
         icon: Icons.bolt_outlined,
       ),
+      DashboardDestination(
+        title: 'Campus Map',
+        subtitle: 'View room layouts and occupancy',
+        route: '/campus-map',
+        icon: Icons.map_outlined,
+      ),
+      DashboardDestination(
+        title: 'Route Navigator',
+        subtitle: 'Find a route between rooms',
+        route: '/route-navigator',
+        icon: Icons.alt_route,
+      ),
     ],
   );
 }

@@ -109,6 +109,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CampusMapScreen(),
       ),
       GoRoute(
+        path: '/route-navigator',
+        builder: (context, state) => const RouteNavigatorScreen(),
+      ),
+      GoRoute(
         path: '/events',
         builder: (context, state) => const EventsScreen(),
       ),

@@ -66,6 +66,24 @@ class StudentDashboardScreen extends ConsumerWidget {
                     onTap: () => context.go('/rooms/availability'),
                   ),
                 ),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.map_outlined),
+                    title: const Text('Campus Map'),
+                    subtitle: const Text('View room layouts and occupancy'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/campus-map'),
+                  ),
+                ),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.alt_route),
+                    title: const Text('Route Navigator'),
+                    subtitle: const Text('Find a route between rooms'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/route-navigator'),
+                  ),
+                ),
               ],
             ),
     );
