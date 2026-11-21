@@ -14,6 +14,7 @@ import '../../features/library/library_screen.dart';
 import '../../features/maintenance/maintenance_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/resource_optimizer/resource_optimizer_screen.dart';
+import '../../features/rooms/room_availability_screen.dart';
 import '../../features/room_management/room_management_screen.dart';
 import '../../features/timetable/timetable_screen.dart';
 import '../../features/what_if_simulator/what_if_simulator_screen.dart';
@@ -51,6 +52,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student/timetable',
         builder: (context, state) => const TimetableScreen(),
+      ),
+      GoRoute(
+        path: '/faculty/timetable',
+        builder: (context, state) => const FacultyTimetableScreen(),
+      ),
+      GoRoute(
+        path: '/rooms/availability',
+        builder: (context, state) => const RoomAvailabilityScreen(),
       ),
       GoRoute(
         path: '/faculty',

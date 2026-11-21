@@ -1,11 +1,26 @@
-import 'package:flutter/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
-import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/dashboard_menu.dart';
 
 class FacultyDashboardScreen extends StatelessWidget {
   const FacultyDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const EmptyState(title: 'Faculty Dashboard');
+  Widget build(BuildContext context) => const DashboardMenu(
+    title: 'Faculty Dashboard',
+    destinations: [
+      DashboardDestination(
+        title: 'Faculty Timetable',
+        subtitle: 'View your teaching schedule',
+        route: '/faculty/timetable',
+        icon: Icons.calendar_month_outlined,
+      ),
+      DashboardDestination(
+        title: 'Room Availability Finder',
+        subtitle: 'Find available rooms',
+        route: '/rooms/availability',
+        icon: Icons.meeting_room_outlined,
+      ),
+    ],
+  );
 }

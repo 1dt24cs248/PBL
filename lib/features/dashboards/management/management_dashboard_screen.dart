@@ -1,11 +1,20 @@
-import 'package:flutter/widgets.dart';
+import 'package:material_ui/material_ui.dart';
 
-import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/dashboard_menu.dart';
 
 class ManagementDashboardScreen extends StatelessWidget {
   const ManagementDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      const EmptyState(title: 'Management Dashboard');
+  Widget build(BuildContext context) => const DashboardMenu(
+    title: 'Management Dashboard',
+    destinations: [
+      DashboardDestination(
+        title: 'Room Availability Finder',
+        subtitle: 'Find available rooms',
+        route: '/rooms/availability',
+        icon: Icons.meeting_room_outlined,
+      ),
+    ],
+  );
 }
