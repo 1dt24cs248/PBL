@@ -126,8 +126,14 @@ def seed(db: Session, dataset: Dataset | None = None) -> str:
                         password_hash=hash_password(DEV_PASSWORD), provenance="SYNTHETIC"))
     for row in data.holidays:
         holiday_date = date.fromisoformat(row["holiday_date"])
-        if db.scalar(select(Holiday).where(Holiday.holiday_date == holiday_date)) is None:
-            db.add(Holiday(holiday_date=holiday_date, name=row["name"], provenance=row["provenance"]))
+        holiday = db.scalar(select(Holiday).where(Holiday.holiday_date == holiday_date))
+        if holiday is None:
+            holiday = Holiday(holiday_date=holiday_date, name=row["name"], source=row["source"], provenance=row["provenance"])
+            db.add(holiday)
+        else:
+            holiday.name = row["name"]
+            holiday.source = row["source"]
+            holiday.provenance = row["provenance"]
     _seed_floorplan(db, room_rows)
     db.commit()
     report = _count_report(db, data)
@@ -209,7 +215,7 @@ def _count_report(db: Session, data: Dataset) -> str:
         *[f"- {item}" for item in data.inferred],
         "",
         "## Provenance",
-        "Student roster and division assignments are REAL_DSATM_PDF. Room infrastructure, equipment and energy calculations are SYNTHETIC per the spec. Additional room fields, missing source attributes, and the Deepavali entry supplied by M1 are tagged INFERRED.",
+        "Student roster and division assignments are REAL_DSATM_PDF. Room infrastructure, equipment, energy calculations, and the M7 type/capacity/eligibility values for A-F2-11 and A-F2-12 are SYNTHETIC. The added rooms' floor is inferred from their IDs; the Deepavali entry supplied by M1 is tagged INFERRED.",
         "",
         "M1 roster, room and energy seed report. M2 timetable import results are appended below.",
         "",

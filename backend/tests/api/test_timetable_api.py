@@ -1,12 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
-from app.models import AcademicTerm, DivisionSectionMap, Faculty, Student, User
+from app.models import AcademicTerm, DivisionSectionMap, Faculty, Student, TimetableSession, User
 from app.security import hash_password
 from app.seed import DEV_PASSWORD, seed
 
@@ -41,6 +41,7 @@ def m2_client():
     client = TestClient(app)
     client.faculty_id = faculty_id
     client.student_username = student_username
+    client.SessionLocal = SessionLocal
     yield client
     app.dependency_overrides.clear()
     engine.dispose()
@@ -148,3 +149,183 @@ def test_role_and_authentication_boundaries(m2_client):
     assert m2_client.get("/sections/E/timetable?term=2026-27-ODD", headers=maintenance).status_code == 403
     hod = auth(m2_client, "hod_cse")
     assert m2_client.get("/timetable/conflicts?term=2026-27-ODD", headers=hod).status_code == 200
+
+
+def test_m7_room_capacity_and_availability_filters(m2_client):
+    headers = auth(m2_client, "admin1")
+    rooms_response = m2_client.get("/rooms", headers=headers)
+    assert rooms_response.status_code == 200
+    rooms = rooms_response.json()
+    assert len(rooms) == 66
+    assert all("timetable_eligible" in row for row in rooms)
+    added = {row["number"]: row for row in rooms if row["number"] in {"A-F2-11", "A-F2-12"}}
+    assert added["A-F2-11"]["capacity"] == 60
+    assert added["A-F2-11"]["room_type"] == "Classroom"
+    assert added["A-F2-11"]["data_status"] == "SYNTHETIC"
+    assert added["A-F2-12"]["capacity"] == 30
+    assert added["A-F2-12"]["room_type"] == "Computer Lab"
+    assert added["A-F2-12"]["data_status"] == "SYNTHETIC"
+    default = m2_client.get("/rooms/availability?day=Wed&period=1", headers=headers).json()
+    all_rooms = m2_client.get(
+        "/rooms/availability?day=Wed&period=1&include_non_timetable=true", headers=headers
+    ).json()
+    assert len(default["rooms"]) == sum(row["timetable_eligible"] for row in rooms) == 32
+    assert len(all_rooms["rooms"]) == 66
+    assert default["term_code"] == all_rooms["term_code"] == "2026-27-ODD"
+
+
+def test_m7_timetable_fields_period_grid_and_calendar(m2_client):
+    headers = auth(m2_client, m2_client.student_username)
+    timetable = m2_client.get("/timetable/student/me", headers=headers).json()
+    required = {"subject_code", "subject_name", "session_type", "start_time", "end_time",
+                "faculty_names", "faculty_details", "room_id", "room_real_label", "room_inferred",
+                "batch", "block_id", "room_required", "provenance"}
+    assert timetable["sessions"]
+    assert all(required.issubset(session) for session in timetable["sessions"])
+    assert all(isinstance(session["faculty_names"], list) for session in timetable["sessions"])
+    assert all(session["session_type"] in {"Lecture", "Lab", "Activity"} for session in timetable["sessions"])
+    assert all(isinstance(session["start_time"], str) and isinstance(session["end_time"], str)
+               for session in timetable["sessions"])
+    assert any(session["session_type"] == "Activity" and not session["room_required"]
+               for session in timetable["sessions"])
+
+    periods = m2_client.get("/meta/periods", headers=headers).json()
+    assert periods["periods"] == [
+        {"period": 1, "start": "09:30", "end": "10:25"},
+        {"period": 2, "start": "10:25", "end": "11:20"},
+        {"period": 3, "start": "11:35", "end": "12:30"},
+        {"period": 4, "start": "12:30", "end": "13:25"},
+        {"period": 5, "start": "14:15", "end": "15:10"},
+        {"period": 6, "start": "15:10", "end": "16:05"},
+        {"period": 7, "start": "16:05", "end": "17:00"},
+    ]
+    assert periods["breaks"] == [
+        {"after_period": 2, "label": "Tea", "start": "11:20", "end": "11:35"},
+        {"after_period": 4, "label": "Lunch", "start": "13:25", "end": "14:15"},
+    ]
+
+    for day, name in (("2026-11-10", "Deepavali 2026"), ("2026-11-27", "Kanaka Jayanthi")):
+        result = m2_client.get(f"/timetable/date/{day}", headers=headers).json()
+        assert result["holiday"] == name and result["sessions"] == []
+    holidays = m2_client.get("/calendar/holidays", headers=headers).json()
+    assert [(row["date"], row["name"], row["source"]) for row in holidays] == [
+        ("2026-11-10", "Deepavali 2026", "M1"),
+        ("2026-11-27", "Kanaka Jayanthi", "ERP_SCREENSHOT"),
+    ]
+    calendar = m2_client.get("/calendar/summary", headers=headers).json()
+    assert calendar["holidays"] == holidays
+    assert all(term["start_date"] is None and term["end_date"] is None for term in calendar["terms"])
+    assert "not known" in calendar["note"]
+
+
+def test_m7_erp_demo_endpoints_are_synthetic_deterministic_and_student_only(m2_client, monkeypatch):
+    from datetime import date
+    from app.routers import student_demo
+
+    monkeypatch.setattr(student_demo, "_today", lambda: date(2026, 11, 21))
+    endpoints = ("/students/me/profile", "/students/me/attendance?from=2026-10-01&to=2026-11-30",
+                 "/students/me/attendance/summary", "/students/me/lms/subjects", "/students/me/fees")
+    assert all(m2_client.get(path).status_code == 401 for path in endpoints)
+    student_headers = auth(m2_client, m2_client.student_username)
+    with m2_client.SessionLocal() as db:
+        session_count_before_demo = db.scalar(select(func.count()).select_from(TimetableSession))
+    responses = [m2_client.get(path, headers=student_headers) for path in endpoints]
+    assert all(response.status_code == 200 for response in responses)
+    assert all(response.json()["data_status"] == "SYNTHETIC" for response in responses)
+    profile = responses[0].json()
+    assert profile["section_label"] == "CS-5-E"
+    assert profile["section_mapping_status"] == "INFERRED"
+    assert profile["roll_no"] is None and profile["home_room"]["code"] == "A-F5-02"
+    assert not {"phone", "email", "parent", "photo"} & set(profile)
+    ignored_identifier = m2_client.get(
+        f"/students/me/profile?usn={m2_client.student_username}", headers=student_headers
+    ).json()
+    if ignored_identifier["usn"] != profile["usn"]:
+        pytest.fail("Profile must derive identity from the authenticated token")
+    with m2_client.SessionLocal() as db:
+        other_username = db.scalar(select(User.username).where(
+            User.role == "student", User.username != m2_client.student_username
+        ).order_by(User.username))
+    if other_username:
+        other_profile = m2_client.get(
+            "/students/me/profile", headers=auth(m2_client, other_username)
+        ).json()
+        if other_profile["usn"] != other_username:
+            pytest.fail("A second student token must return only its own profile")
+
+    grid = responses[1].json()["days"]
+    assert m2_client.get(endpoints[1], headers=student_headers).json()["days"] == grid
+    assert grid == sorted(grid, key=lambda row: row["date"], reverse=True)
+    assert all(date.fromisoformat(row["date"]) < date(2026, 11, 21) for row in grid)
+    assert all(row["weekday"] != "Sun" for row in grid)
+    assert any(row["date"] == "2026-11-10" and row["slots"][0]["status"] == "-" for row in grid)
+    monkeypatch.setattr(student_demo, "_today", lambda: date(2026, 12, 1))
+    second_holiday = m2_client.get(
+        "/students/me/attendance?from=2026-11-27&to=2026-11-27", headers=student_headers
+    ).json()["days"]
+    assert second_holiday[0]["slots"][0]["status"] == "-"
+    monkeypatch.setattr(student_demo, "_today", lambda: date(2026, 11, 21))
+    future = m2_client.get("/students/me/attendance?from=2026-11-22&to=2026-12-01",
+                           headers=student_headers).json()["days"]
+    assert future == []
+    summary = responses[2].json()
+    generated = m2_client.get("/students/me/attendance", headers=student_headers).json()["days"]
+    values = [slot["status"] for day in generated for slot in day["slots"] if slot["status"] in {"P", "A", "NA"}]
+    assert summary["overall"]["present"] == values.count("P")
+    assert summary["overall"]["absent"] == values.count("A")
+    assert summary["overall"]["no_attendance"] == values.count("NA")
+    assert summary["overall"]["total"] == len(values)
+    expected_by_subject = {}
+    for day in generated:
+        for slot in day["slots"]:
+            if slot["status"] in {"P", "A", "NA"}:
+                counts = expected_by_subject.setdefault(slot["subject_code"], {"P": 0, "A": 0, "NA": 0})
+                counts[slot["status"]] += 1
+    for subject in summary["subjects"]:
+        counts = expected_by_subject[subject["subject_code"]]
+        assert subject["present"] == counts["P"]
+        assert subject["total"] == sum(counts.values())
+    assert len(responses[3].json()["subjects"]) == 9
+    assert {row["subject_code"]: row["alt_code"] for row in responses[3].json()["subjects"]
+            if row["subject_code"] in {"BCS515B", "BCS506", "B**K507"}} == {
+                "BCS515B": "BCS504B", "BCS506": "BCS505", "B**K507": "BCV508"}
+    assert responses[4].json()["ledger"]["pending"] == responses[4].json()["ledger"]["to_be_collected"] - responses[4].json()["ledger"]["paid"]
+    assert all(receipt["mode"] == "SYNTHETIC" and receipt["receipt_no"].startswith("SYN-")
+               for year in responses[4].json()["years"] for receipt in year["receipts"])
+
+    for username in ("fac1", "hod_cse", "admin1", "maint1"):
+        headers = auth(m2_client, username)
+        assert all(m2_client.get(path.split("?")[0], headers=headers).status_code == 403 for path in endpoints)
+
+    with m2_client.SessionLocal() as db:
+        assert db.scalar(select(func.count()).select_from(TimetableSession)) == session_count_before_demo
+
+
+def test_m7_erp_tuesday_evidence_and_wednesday_regression(m2_client):
+    headers = auth(m2_client, "admin1")
+    tuesday = m2_client.get("/timetable/date/2026-11-24", headers=headers).json()["sessions"]
+    fifth_e = [row for row in tuesday if row["section_code"] == "E"]
+    by_period = {(row["periods"][0], row["batch"]): row for row in fifth_e}
+    assert by_period[(1, "ALL")]["subject_code"] == "BCS503"
+    assert by_period[(1, "ALL")]["faculty_names"] == ["Ms. Swathi A"]
+    assert by_period[(2, "ALL")]["subject_code"] == "BCS501"
+    assert by_period[(2, "ALL")]["faculty_names"] == ["Mrs. Manasa Sandeep"]
+    lab = by_period[(3, "B1")]
+    assert lab["periods"] == [3, 4] and lab["subject_code"] == "BCS501"
+    assert lab["session_type"] == "Lab"
+    assert lab["faculty_names"] == ["Mrs. Manasa Sandeep", "Ashalatha N S"]
+    assert lab["faculty_details"][1]["data_status"] == "REAL_ERP_SCREENSHOT"
+    assert by_period[(3, "B2")]["block_id"] == lab["block_id"]
+    assert by_period[(5, "ALL")]["faculty_names"] == ["Ms. Swathi A"]
+    assert by_period[(6, "ALL")]["faculty_names"] == ["Mr. Parvathisha Pudugosula"]
+    assert by_period[(7, "ALL")]["faculty_names"] == ["Dr. Deepak GB"]
+    assert by_period[(7, "ALL")]["faculty_details"][0]["data_status"] == "REAL_ERP_SCREENSHOT"
+
+    wednesday = m2_client.get("/timetable/date/2026-12-09", headers=headers).json()["sessions"]
+    rows = [row for row in wednesday if row["section_code"] == "E"]
+    indexed = {period: row for row in rows for period in row["periods"]}
+    assert indexed[1]["subject_code"] == indexed[2]["subject_code"] == "BCS502"
+    assert indexed[5]["subject_code"] == "BCS515B"
+    assert indexed[6]["subject_code"] == "BCS501"
+    assert indexed[5]["faculty_names"] == ["Mrs Usha CR"]
+    assert indexed[6]["faculty_names"] == ["Mrs. Manasa Sandeep"]

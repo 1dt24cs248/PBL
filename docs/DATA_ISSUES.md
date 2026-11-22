@@ -10,11 +10,12 @@ Counts after idempotent seed (A-Block only):
 - Room aliases: 54
 - Sections: 6
 - Division-section mappings: 6
-- Holidays: 1
+- Holidays: 2
 
 ## INFERRED decisions
-- A-F2-11: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).
-- A-F2-12: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).
+- A-F2-11: identifier came from M1; floor 2 inferred from ID; type and capacity supplied as SYNTHETIC M7 demo values; connected load remains zero without seeded equipment.
+- A-F2-12: identifier came from M1; floor 2 inferred from ID; type and capacity supplied as SYNTHETIC M7 demo values; connected load remains zero without seeded equipment.
+- Room capacity values are synthetic CSV values; no separate observed capacity_real field or source is provided.
 - A-409: alias is documented against the A-F4-06–10 range; resolved to A-F4-09 from its room number and the floor/room numbering rule.
 - 2 admission-number roster entries are not official USNs; NULL USN stored and source identifiers retained in the database.
 - 3 explicit master-list addendum records have no gender/batch; those fields remain NULL; divisions are derived from USN sequence.
@@ -25,7 +26,7 @@ Counts after idempotent seed (A-Block only):
 - Deepavali 2026-11-10: date/name supplied by M1; holiday status is not evidenced in the dataset spec, so tagged INFERRED.
 
 ## Provenance
-Student roster and division assignments are REAL_DSATM_PDF. Room infrastructure, equipment and energy calculations are SYNTHETIC per the spec. Additional room fields, missing source attributes, and the Deepavali entry supplied by M1 are tagged INFERRED.
+Student roster and division assignments are REAL_DSATM_PDF. Room infrastructure, equipment, energy calculations, and the M7 type/capacity/eligibility values for A-F2-11 and A-F2-12 are SYNTHETIC. The added rooms' floor is inferred from their IDs; the Deepavali entry supplied by M1 is tagged INFERRED.
 
 M1 roster, room and energy seed report. M2 timetable import results are appended below.
 
@@ -132,3 +133,9 @@ Counts are parsed from the three timetable datasets; no clash was automatically 
 
 ### Parser notes
 - 2024-25-EVEN has no subject-code catalogue in the source text; source abbreviations are retained as subject codes and marked INFERRED.
+
+## M7 ERP Evidence Notes
+- Dataset subject code BCS515B (CNS) is shown by the ERP as BCS504B; dataset code BCS506 (MAD) is shown as BCS505; dataset EVS code B**K507 is shown as BCV508. Dataset codes remain canonical; alternatives are display metadata only.
+- For CS-5-E's Tuesday lab display only, dataset initials AL resolve to Mrs. Asha Latha while the ERP screenshot displays Ashalatha N S. The canonical faculty row is unchanged.
+- The dataset supplies no EVS faculty name. Dr. Deepak GB is shown only as a CS-5-E ERP screenshot display value, tagged REAL_ERP_SCREENSHOT.
+- The second confirmed holiday, Kanaka Jayanthi on 2026-11-27, is sourced from ERP_SCREENSHOT.

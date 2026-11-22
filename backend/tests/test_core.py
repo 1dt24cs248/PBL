@@ -71,7 +71,7 @@ def test_me(client):
 def test_student_can_list_rooms(client):
     r = client.get("/rooms", headers=login(client, "stu1"))
     assert r.status_code == 200 and len(r.json()) == 66
-    assert {room["provenance"] for room in r.json()} == {"SYNTHETIC", "INFERRED"}
+    assert {room["provenance"] for room in r.json()} == {"SYNTHETIC"}
 
 
 def test_student_cannot_create_room(client):

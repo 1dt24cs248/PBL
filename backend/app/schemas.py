@@ -40,6 +40,7 @@ class RoomOut(BaseModel):
     aliases: list[str] = Field(validation_alias=AliasChoices("alias_values", "aliases"))
     data_status: str
     capacity_effective: int
+    timetable_eligible: bool
 
 
 class RoomCreate(BaseModel):

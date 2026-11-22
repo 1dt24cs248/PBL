@@ -25,18 +25,22 @@ def parse_dataset(path: Path = SPEC_PATH) -> Dataset:
     text = path.read_text(encoding="utf-8")
     rooms = _parse_rooms(text)
     inferred = []
-    # These two additional room identifiers are expressly requested by M1 but
-    # absent from the source CSV; floor is inferred from their identifier.
-    for room_id in ("A-F2-11", "A-F2-12"):
+    # M1 supplied the identifiers; M7 supplied synthetic room types/capacities.
+    for room_id, facility_type, capacity in (
+        ("A-F2-11", "Classroom", 60),
+        ("A-F2-12", "Computer Lab", 30),
+    ):
         rooms.append({
             "room_id": room_id, "building_id": "A", "building_name": "A Block",
-            "floor_number": 2, "floor_name": "Second Floor", "room_name": "Unspecified room",
-            "facility_type": "Unspecified", "department": "Shared", "capacity_students": 0,
-            "estimated_connected_load_kw": 0.0, "timetable_eligible": False,
-            "data_status": "INFERRED", "provenance": "INFERRED",
-            "notes": "Added per M1; no source specifications were supplied.",
+            "floor_number": 2, "floor_name": "Second Floor",
+            "room_name": f"{facility_type} {room_id[-2:]}",
+            "facility_type": facility_type, "department": "Shared", "capacity_students": capacity,
+            "estimated_connected_load_kw": 0.0, "timetable_eligible": True,
+            "data_status": "SYNTHETIC", "provenance": "SYNTHETIC",
+            "notes": "Room type, capacity, and timetable eligibility are synthetic M7 demo values; floor inferred from ID.",
         })
-        inferred.append(f"{room_id}: added per M1; floor 2 inferred from ID; name, type, capacity, load, and eligibility remain unspecified (zero/false placeholders).")
+        inferred.append(f"{room_id}: identifier came from M1; floor 2 inferred from ID; type and capacity supplied as SYNTHETIC M7 demo values; connected load remains zero without seeded equipment.")
+    inferred.append("Room capacity values are synthetic CSV values; no separate observed capacity_real field or source is provided.")
     aliases = _parse_aliases(text)
     if any(provenance == "INFERRED" for _, _, provenance in aliases):
         inferred.append("A-409: alias is documented against the A-F4-06–10 range; resolved to A-F4-09 from its room number and the floor/room numbering rule.")
@@ -63,8 +67,10 @@ def parse_dataset(path: Path = SPEC_PATH) -> Dataset:
     inferred.append("Energy baseline connected loads are calculated from the synthetic equipment wattage rules (not copied from room CSV estimates); for example A-G04 is 0.71 kW in the baseline and 2.5 kW in the room estimate, retained separately.")
     if len(equipment) != 129:
         raise ValueError(f"Expected 129 equipment rows from rules, parsed {len(equipment)}")
-    # Only this confirmed holiday is in scope; the date is provided by M1.
-    holidays = [{"holiday_date": "2026-11-10", "name": "Deepavali 2026", "provenance": "INFERRED"}]
+    holidays = [
+        {"holiday_date": "2026-11-10", "name": "Deepavali 2026", "source": "M1", "provenance": "INFERRED"},
+        {"holiday_date": "2026-11-27", "name": "Kanaka Jayanthi", "source": "ERP_SCREENSHOT", "provenance": "REAL_ERP_SCREENSHOT"},
+    ]
     inferred.append("Deepavali 2026-11-10: date/name supplied by M1; holiday status is not evidenced in the dataset spec, so tagged INFERRED.")
     return Dataset(rooms, aliases, equipment, students, sections, holidays, inferred)
 
