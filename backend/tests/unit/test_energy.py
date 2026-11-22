@@ -28,7 +28,12 @@ def test_seeded_energy_baselines_match_synthetic_equipment(tmp_path):
         assert by_number["A-G03"].connected_load_kw == 1.19
         assert by_number["A-B03"].connected_load_kw == 2.16
         assert by_number["A-F2-11"].connected_load_kw == 0
-        assert by_number["A-F2-11"].provenance == "INFERRED"
+        assert by_number["A-F2-11"].provenance == "SYNTHETIC"
+        assert rooms["A-F2-11"].capacity == 60
+        assert rooms["A-F2-11"].room_type == "Classroom"
+        assert rooms["A-F2-12"].capacity == 30
+        assert rooms["A-F2-12"].room_type == "Computer Lab"
+        assert rooms["A-F2-12"].provenance == "SYNTHETIC"
         for row in baselines.values():
             assert row.daily_kwh == round(row.connected_load_kw * row.hours_per_day, 4)
             assert row.weekly_kwh == round(row.daily_kwh * row.days_per_week, 4)

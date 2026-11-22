@@ -150,6 +150,7 @@ class Holiday(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     holiday_date: Mapped[object] = mapped_column(Date, unique=True)
     name: Mapped[str] = mapped_column(String(100))
+    source: Mapped[str] = mapped_column(String(30), default="UNKNOWN")
     provenance: Mapped[str] = mapped_column(String(20), default="REAL_DSATM_PDF")
 
 

@@ -98,6 +98,89 @@ def _route_steps(path: list[dict], edges: list[dict]) -> list[dict]:
     return output
 
 
+def _room_display(room: Room) -> str:
+    return f"{room.real_label} ({room.number})"
+
+
+def _spoken_floor(floor: int) -> str:
+    return "Basement" if floor == -1 else "Ground Floor" if floor == 0 else f"Floor {floor}"
+
+
+def _instructions(path: list[dict], edges: list[dict], start_room: Room,
+                  end_room: Room, mode: str) -> list[dict]:
+    start_label, end_label = _room_display(start_room), _room_display(end_room)
+    if start_room.id == end_room.id:
+        return [{"index": 0, "kind": "arrive", "text": f"You have arrived at {end_label}",
+                 "floor": end_room.floor, "to_floor": None, "distance_m": 0,
+                 "path_from_index": 0, "path_to_index": 0}]
+
+    output = [{"index": 0, "kind": "start", "text": f"Leave {start_label}",
+               "floor": start_room.floor, "to_floor": None, "distance_m": 0,
+               "path_from_index": 0, "path_to_index": 0}]
+    index = 1
+    edge_i = 0
+    while edge_i < len(edges):
+        edge = edges[edge_i]
+        source = path[edge_i]
+        target = path[edge_i + 1]
+        if edge["mode"] == "corridor":
+            first_edge = edge_i
+            floor = source["floor"]
+            while (edge_i < len(edges) and edges[edge_i]["mode"] == "corridor"
+                   and path[edge_i]["floor"] == floor
+                   and path[edge_i + 1]["floor"] == floor):
+                edge_i += 1
+            last_node = path[edge_i]
+            metres = round(sum(float(row["distance_m"]) for row in edges[first_edge:edge_i]))
+            kind = last_node["kind"]
+            if kind == "stairs_core_west":
+                landmark = "the West Stairs"
+            elif kind == "stairs_core_east":
+                landmark = "the East Stairs"
+            elif kind == "lifts_core_center":
+                landmark = "the Lift"
+            elif last_node["kind"] == "door" and last_node["node_key"] == path[-1]["node_key"]:
+                landmark = end_label
+            else:
+                landmark = "the corridor"
+            floor_name = _spoken_floor(floor)
+            output.append({"index": index, "kind": "walk",
+                           "text": f"Walk {metres} m along the {floor_name} corridor towards {landmark}.",
+                           "floor": floor, "to_floor": None, "distance_m": metres,
+                           "path_from_index": first_edge, "path_to_index": edge_i})
+            index += 1
+            continue
+
+        mode_name = edge["mode"]
+        first_edge = edge_i
+        core_kind = source["kind"]
+        while (edge_i < len(edges) and edges[edge_i]["mode"] == mode_name
+               and path[edge_i]["kind"] == core_kind
+               and path[edge_i + 1]["kind"] == core_kind):
+            edge_i += 1
+        floor_from = path[first_edge]["floor"]
+        floor_to = path[edge_i]["floor"]
+        direction = "up" if floor_to > floor_from else "down"
+        count = abs(floor_to - floor_from)
+        floor_name = _spoken_floor(floor_to)
+        if mode_name == "lift":
+            core_name, kind = "the Lift", "lift"
+        else:
+            core_name = "the West Stairs" if core_kind == "stairs_core_west" else "the East Stairs"
+            kind = "stairs"
+        metres = round(sum(float(row["distance_m"]) for row in edges[first_edge:edge_i]))
+        output.append({"index": index, "kind": kind,
+                       "text": f"Take {core_name} {direction} {count} floors to {floor_name}.",
+                       "floor": floor_from, "to_floor": floor_to, "distance_m": metres,
+                       "path_from_index": first_edge, "path_to_index": edge_i})
+        index += 1
+
+    output.append({"index": index, "kind": "arrive", "text": f"You have arrived at {end_label}",
+                   "floor": end_room.floor, "to_floor": None, "distance_m": 0,
+                   "path_from_index": len(path) - 1, "path_to_index": len(path) - 1})
+    return output
+
+
 @router.get("/floorplan")
 def list_floors(_user: User = Depends(get_current_user)):
     artifact = _artifact()
@@ -233,10 +316,16 @@ def nav_route(
     if canonical_from == canonical_to:
         start_node = doors[canonical_from]
         path = [_route_path_node(start_node)]
+        room = db.scalar(select(Room).where(Room.number == canonical_from))
         return {"from_room": canonical_from, "to_room": canonical_to, "mode": mode,
                 "node_keys": [start], "edges": [], "distance_m": 0,
                 "route_cost_seconds": 0, "provenance": "SYNTHETIC", "path": path,
-                "steps": [], "floors_visited": [start_node.floor]}
+                "steps": [], "floors_visited": [start_node.floor],
+                "instructions": _instructions(path, [], room, room, mode),
+                "summary": {"distance_m": 0, "est_seconds": 0, "est_minutes": 0,
+                            "floors_traversed": [start_node.floor], "floors_changed": 0,
+                            "mode": mode, "start": {"code": room.number, "real_label": room.real_label, "floor": room.floor},
+                            "end": {"code": room.number, "real_label": room.real_label, "floor": room.floor}}}
 
     nodes = list(db.scalars(select(NavNode)))
     nodes_by_id = {node.id: node for node in nodes}
@@ -286,6 +375,12 @@ def nav_route(
     route_nodes = [_route_path_node(nodes_by_key[key])
                    for key in [start, *[target for _, target, _ in steps]]]
     floors_visited = list(dict.fromkeys(node["floor"] for node in route_nodes))
+    start_room = db.scalar(select(Room).where(Room.number == canonical_from))
+    end_room = db.scalar(select(Room).where(Room.number == canonical_to))
+    instructions = _instructions(route_nodes, route_edges, start_room, end_room, mode)
+    floor_changes = sum(left["floor"] != right["floor"]
+                         for left, right in zip(route_nodes, route_nodes[1:]))
+    estimate_seconds = round(sum(edge["weight"] for edge in route_edges), 4)
     return {
         "from_room": canonical_from, "to_room": canonical_to, "mode": mode,
         "node_keys": [start, *[target for _, target, _ in steps]],
@@ -296,4 +391,15 @@ def nav_route(
         "path": route_nodes,
         "steps": _route_steps(route_nodes, route_edges),
         "floors_visited": floors_visited,
+        "instructions": instructions,
+        "summary": {"distance_m": round(sum(edge["distance_m"] for edge in route_edges), 4),
+                    "est_seconds": estimate_seconds,
+                    "est_minutes": math.ceil(estimate_seconds / 60),
+                    "floors_traversed": floors_visited,
+                    "floors_changed": floor_changes,
+                    "mode": mode,
+                    "start": {"code": start_room.number, "real_label": start_room.real_label,
+                              "floor": start_room.floor},
+                    "end": {"code": end_room.number, "real_label": end_room.real_label,
+                            "floor": end_room.floor}},
     }

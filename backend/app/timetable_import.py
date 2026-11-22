@@ -533,8 +533,17 @@ def _write_import_report(parsed: ParsedTimetables) -> str:
         report.append("- None detected.")
     if parsed.parse_issues:
         report.extend(["", "### Parser notes", *[f"- {issue}" for issue in parsed.parse_issues]])
+    report.extend([
+        "",
+        "## M7 ERP Evidence Notes",
+        "- Dataset subject code BCS515B (CNS) is shown by the ERP as BCS504B; dataset code BCS506 (MAD) is shown as BCS505; dataset EVS code B**K507 is shown as BCV508. Dataset codes remain canonical; alternatives are display metadata only.",
+        "- For CS-5-E's Tuesday lab display only, dataset initials AL resolve to Mrs. Asha Latha while the ERP screenshot displays Ashalatha N S. The canonical faculty row is unchanged.",
+        "- The dataset supplies no EVS faculty name. Dr. Deepak GB is shown only as a CS-5-E ERP screenshot display value, tagged REAL_ERP_SCREENSHOT.",
+        "- The second confirmed holiday, Kanaka Jayanthi on 2026-11-27, is sourced from ERP_SCREENSHOT.",
+        "",
+    ])
     report.append("")
-    report_text = "\n".join(report)
+    report_text = "\n".join(report).rstrip()
     data_issues = SPEC_PATH.parent / "DATA_ISSUES.md"
     existing = data_issues.read_text(encoding="utf-8") if data_issues.exists() else "# Data Issues\n"
     existing = re.sub(r"\n## M2 Timetable Import Report\n[\s\S]*$", "", existing).rstrip()

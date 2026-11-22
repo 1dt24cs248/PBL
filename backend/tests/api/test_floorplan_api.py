@@ -197,3 +197,37 @@ def test_unknown_room_bad_mode_and_trivial_route(nav_client):
     assert same.json()["node_keys"] == ["f1_door_A-F1-10"]
     assert same.json()["edges"] == []
     assert same.json()["distance_m"] == same.json()["route_cost_seconds"] == 0
+
+
+def test_m7_navigation_instructions_are_human_readable_additive_and_indexed(nav_client):
+    headers = auth(nav_client, "fac1")
+    response = _route(nav_client, headers, "A-G06", "A-F5-05", "accessible")
+    assert response.status_code == 200
+    route = response.json()
+    old_fields = {"from_room", "to_room", "mode", "node_keys", "edges", "distance_m",
+                  "route_cost_seconds", "provenance", "path", "steps", "floors_visited"}
+    assert old_fields.issubset(route)
+    instructions = route["instructions"]
+    assert [row["kind"] for row in instructions] == ["start", "walk", "lift", "walk", "arrive"]
+    assert instructions[0]["text"] == "Leave Staff Room 06 (A-G06)"
+    assert instructions[1]["text"] == "Walk 27 m along the Ground Floor corridor towards the Lift."
+    assert instructions[3]["text"] == "Walk 27 m along the Floor 5 corridor towards Computer Lab 05 (A-F5-05)."
+    assert instructions[-1]["text"] == "You have arrived at Computer Lab 05 (A-F5-05)"
+    assert instructions[2]["text"] == "Take the Lift up 5 floors to Floor 5."
+    assert all("corridor_" not in row["text"] and "door_" not in row["text"]
+               and "stairs_core_" not in row["text"] and "lifts_core_" not in row["text"]
+               for row in instructions)
+    assert len(instructions) < len(route["steps"])
+    assert all(0 <= row["path_from_index"] <= row["path_to_index"] < len(route["path"])
+               for row in instructions)
+    assert sum(row["distance_m"] for row in instructions) == pytest.approx(route["distance_m"], abs=0.5)
+    assert route["summary"]["floors_traversed"] == [0, 1, 2, 3, 4, 5]
+    assert route["summary"]["floors_changed"] == 5
+    assert route["summary"]["est_minutes"] == 3
+    assert all(row["kind"] != "stairs" for row in instructions)
+
+    same = _route(nav_client, headers, "A-108", "A-F1-10", "accessible").json()
+    assert [row["kind"] for row in same["instructions"]] == ["arrive"]
+    assert same["instructions"][0]["path_from_index"] == same["instructions"][0]["path_to_index"] == 0
+    for source, target in (("A-108", "305"), ("SH-2", "A-F5-05")):
+        assert _route(nav_client, headers, source, target, "lift").status_code == 200

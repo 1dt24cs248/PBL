@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+from datetime import date
 
 
 class Settings(BaseSettings):
@@ -18,6 +19,13 @@ class Settings(BaseSettings):
     energy_tariff_inr_per_kwh: float = Field(default=8.5, ge=0)
     standby_fraction: float = Field(default=0.0, ge=0, le=1)
     periods_per_day: int = Field(default=7, gt=0)
+    demo_attendance_start: date = date(2026, 10, 1)
+    demo_salt: str = "pbl-synthetic-attendance-v1"
+    demo_fee_tuition_per_year: int = Field(default=100000, ge=0)
+    demo_fee_academic_per_year: int = Field(default=10000, ge=0)
+    demo_fee_examination_per_year: int = Field(default=5000, ge=0)
+    demo_fee_university_per_year: int = Field(default=3000, ge=0)
+    demo_fee_skill_lab_per_year: int = Field(default=2000, ge=0)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
