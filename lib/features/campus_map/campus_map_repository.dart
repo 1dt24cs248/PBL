@@ -83,9 +83,7 @@ class ApiCampusMapRepository implements CampusMapRepository {
   Future<List<CampusRoomRecord>> getRooms() async {
     final response = await _apiClient.dio.get<List<dynamic>>('/rooms');
     return response.data!
-        .map(
-          (item) => CampusRoomRecord.fromJson(item as Map<String, dynamic>),
-        )
+        .map((item) => CampusRoomRecord.fromJson(item as Map<String, dynamic>))
         .toList();
   }
 }
@@ -127,8 +125,7 @@ final campusFloorIndexProvider = FutureProvider<CampusFloorIndex>(
   retry: (_, _) => null,
 );
 
-typedef CampusFloorQuery =
-    ({int floor, String day, int period, String? date});
+typedef CampusFloorQuery = ({int floor, String day, int period, String? date});
 
 final campusFloorPlanProvider =
     FutureProvider.family<CampusFloorPlan, CampusFloorQuery>(

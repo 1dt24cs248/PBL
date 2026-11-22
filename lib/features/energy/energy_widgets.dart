@@ -22,9 +22,10 @@ class EnergyErrorView extends StatelessWidget {
       403 => 'You do not have permission to view this information.',
       404 => 'The requested term or proposal was not found.',
       409 => 'Data changed. Rerun the optimization before applying.',
-      422 => detail == null || detail.isEmpty
-          ? 'The request was not valid.'
-          : 'Invalid request: $detail',
+      422 =>
+        detail == null || detail.isEmpty
+            ? 'The request was not valid.'
+            : 'Invalid request: $detail',
       null when error is DioException =>
         'Network error. Check your connection and try again.',
       null => detail ?? 'Unable to load energy information.',
@@ -40,10 +41,7 @@ class EnergyErrorView extends StatelessWidget {
             Text(message, textAlign: TextAlign.center),
             if (status != 401) ...[
               const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: onRetry,
-                child: const Text('Retry'),
-              ),
+              OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ],
         ),

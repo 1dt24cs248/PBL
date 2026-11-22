@@ -21,6 +21,7 @@ import '../../features/rooms/room_availability_screen.dart';
 import '../../features/room_management/room_management_screen.dart';
 import '../../features/timetable/timetable_screen.dart';
 import '../../features/what_if_simulator/what_if_simulator_screen.dart';
+import '../../features/student_erp/student_erp_screens.dart';
 
 String roleDashboardRoute(String role) => switch (role) {
   'student' => '/student',
@@ -40,6 +41,13 @@ String? energyRouteRedirect(String role, String location) {
   return null;
 }
 
+String? studentRouteRedirect(String role, String location) {
+  if (location.startsWith('/student/') && role != 'student') {
+    return roleDashboardRoute(role);
+  }
+  return energyRouteRedirect(role, location);
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
   return GoRouter(
@@ -51,7 +59,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final loggingIn = state.matchedLocation == '/login';
       if (user == null) return loggingIn ? null : '/login';
       if (loggingIn) return roleDashboardRoute(user.role);
-      return energyRouteRedirect(user.role, state.matchedLocation);
+      return studentRouteRedirect(user.role, state.matchedLocation);
     },
     routes: [
       GoRoute(
@@ -65,6 +73,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student/timetable',
         builder: (context, state) => const TimetableScreen(),
+      ),
+      GoRoute(
+        path: '/student/calendar',
+        builder: (context, state) => const AcademicCalendarScreen(),
+      ),
+      GoRoute(
+        path: '/student/attendance',
+        builder: (context, state) => const AttendanceScreen(),
+      ),
+      GoRoute(
+        path: '/student/lms',
+        builder: (context, state) => const LmsScreen(),
+      ),
+      GoRoute(
+        path: '/student/fees',
+        builder: (context, state) => const StudentFeesScreen(),
+      ),
+      GoRoute(
+        path: '/student/profile',
+        builder: (context, state) => const StudentProfileScreen(),
       ),
       GoRoute(
         path: '/faculty/timetable',

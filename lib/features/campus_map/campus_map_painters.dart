@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart' show kTouchSlop;
 import 'package:material_ui/material_ui.dart';
 
 import 'campus_map_models.dart';
+import 'isometric_transform.dart';
 
 Color campusApiColor(String value) {
   if (!RegExp(r'^#[0-9A-Fa-f]{6}$').hasMatch(value)) {
@@ -324,11 +325,7 @@ class CampusRouteFloorPainter extends CustomPainter {
       final isStairs = node.kind.toLowerCase().contains('stair');
       final isLift = node.kind.toLowerCase().contains('lift');
       if (isStart) {
-        canvas.drawCircle(
-          point,
-          18,
-          Paint()..color = const Color(0xFF1D4ED8),
-        );
+        canvas.drawCircle(point, 18, Paint()..color = const Color(0xFF1D4ED8));
       }
       if (isEnd) {
         canvas.drawCircle(
@@ -372,4 +369,202 @@ class CampusRouteFloorPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CampusRouteFloorPainter oldDelegate) =>
       oldDelegate.route != route || oldDelegate.floor != floor;
+}
+
+class CampusIsometricMapView extends StatelessWidget {
+  const CampusIsometricMapView({
+    super.key,
+    required this.plan,
+    required this.onRoomTap,
+    this.energyByRoom = const {},
+  });
+
+  final CampusFloorPlan plan;
+  final ValueChanged<CampusFloorRoom> onRoomTap;
+  final Map<String, double> energyByRoom;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final width = constraints.maxWidth;
+      const transform = IsometricTransform();
+      return SizedBox(
+        key: const Key('campus_isometric_canvas'),
+        width: width,
+        height: width * 0.6,
+        child: GestureDetector(
+          onTapUp: (details) {
+            final inverse = transform.toPlan(
+              details.localPosition,
+              floor: plan.floor,
+            );
+            final room = hitTestCampusRoom(plan.rooms, inverse);
+            if (room != null) onRoomTap(room);
+          },
+          child: CustomPaint(
+            size: Size(width, width * 0.6),
+            painter: CampusIsometricPainter(
+              plan: plan,
+              transform: transform,
+              reduceEffects: false,
+              energyByRoom: energyByRoom,
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class CampusIsometricPainter extends CustomPainter {
+  const CampusIsometricPainter({
+    required this.plan,
+    required this.transform,
+    required this.reduceEffects,
+    this.energyByRoom = const {},
+  });
+
+  final CampusFloorPlan plan;
+  final IsometricTransform transform;
+  final bool reduceEffects;
+  final Map<String, double> energyByRoom;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = const Color(0xFF0B1120),
+    );
+
+    final gridPaint = Paint()
+      ..color = const Color(0xFF1E293B)
+      ..strokeWidth = 1;
+    for (var x = 0.0; x < size.width; x += 32) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
+    }
+    for (var y = 0.0; y < size.height; y += 32) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    for (final room in plan.rooms) {
+      final geometry = room.geometry;
+      final leftTop = transform.toScreen(
+        Offset(geometry.x, geometry.y),
+        floor: plan.floor,
+      );
+      final rightTop = transform.toScreen(
+        Offset(geometry.x + geometry.width, geometry.y),
+        floor: plan.floor,
+      );
+      final rightBottom = transform.toScreen(
+        Offset(geometry.x + geometry.width, geometry.y + geometry.height),
+        floor: plan.floor,
+      );
+      final leftBottom = transform.toScreen(
+        Offset(geometry.x, geometry.y + geometry.height),
+        floor: plan.floor,
+      );
+      final statusColor = _statusColor(room);
+      const extrusion = 12.0;
+
+      final top = Path()
+        ..moveTo(leftTop.dx, leftTop.dy)
+        ..lineTo(rightTop.dx, rightTop.dy)
+        ..lineTo(rightBottom.dx, rightBottom.dy)
+        ..lineTo(leftBottom.dx, leftBottom.dy)
+        ..close();
+
+      canvas.drawPath(
+        top,
+        Paint()..color = statusColor.withValues(alpha: 0.82),
+      );
+      canvas.drawPath(
+        top,
+        Paint()
+          ..color = reduceEffects
+              ? statusColor
+              : statusColor.withValues(alpha: 0.9)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
+      );
+
+      final rightSide = Path()
+        ..moveTo(rightTop.dx, rightTop.dy)
+        ..lineTo(rightBottom.dx, rightBottom.dy)
+        ..lineTo(rightBottom.dx, rightBottom.dy + extrusion)
+        ..lineTo(rightTop.dx, rightTop.dy + extrusion)
+        ..close();
+      canvas.drawPath(
+        rightSide,
+        Paint()..color = statusColor.withValues(alpha: 0.48),
+      );
+
+      final bottomSide = Path()
+        ..moveTo(leftBottom.dx, leftBottom.dy)
+        ..lineTo(rightBottom.dx, rightBottom.dy)
+        ..lineTo(rightBottom.dx, rightBottom.dy + extrusion)
+        ..lineTo(leftBottom.dx, leftBottom.dy + extrusion)
+        ..close();
+      canvas.drawPath(
+        bottomSide,
+        Paint()..color = statusColor.withValues(alpha: 0.30),
+      );
+
+      final label = TextPainter(
+        text: TextSpan(
+          text: room.roomId,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      label.paint(
+        canvas,
+        Offset(
+          (leftTop.dx + rightBottom.dx) / 2 - label.width / 2,
+          (leftTop.dy + rightBottom.dy) / 2 - label.height / 2,
+        ),
+      );
+    }
+
+    for (final core in plan.cores) {
+      final point = transform.toScreen(
+        Offset(core.geometry.x, core.geometry.y),
+        floor: plan.floor,
+      );
+      canvas.drawCircle(
+        point,
+        8,
+        Paint()
+          ..color = const Color(0xFF64748B)
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+    }
+  }
+
+  Color _statusColor(CampusFloorRoom room) {
+    final kwh = energyByRoom[room.roomId];
+    if (kwh != null) {
+      if (kwh >= 20) return const Color(0xFFDC2626);
+      if (kwh >= 10) return const Color(0xFFF59E0B);
+      return const Color(0xFF14B8A6);
+    }
+    if (room.status == 'under_maintenance') return const Color(0xFFEF4444);
+    if (room.status == 'temporarily_unavailable') {
+      return const Color(0xFF64748B);
+    }
+    if (room.occupancy?.occupied == true) return const Color(0xFFF59E0B);
+    if (room.status == 'available') return const Color(0xFF10B981);
+    return const Color(0xFF64748B);
+  }
+
+  @override
+  bool shouldRepaint(covariant CampusIsometricPainter oldDelegate) =>
+      oldDelegate.plan != plan ||
+      oldDelegate.transform != transform ||
+      oldDelegate.reduceEffects != reduceEffects;
 }

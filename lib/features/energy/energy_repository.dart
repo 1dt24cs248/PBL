@@ -9,9 +9,7 @@ const bool useMockEnergyRepository = false;
 abstract interface class EnergyRepository {
   Future<EnergyBaseline> getBaseline();
   Future<EnergyUtilization> getUtilization();
-  Future<EnergyOptimizationResult> optimize(
-    EnergyOptimizationRequest request,
-  );
+  Future<EnergyOptimizationResult> optimize(EnergyOptimizationRequest request);
   Future<List<EnergyProposalSummary>> getProposals();
   Future<EnergyProposalDetail> getProposal(String id);
   Future<EnergyProposalStatus> updateProposal(String id, String action);
@@ -53,9 +51,8 @@ class ApiEnergyRepository implements EnergyRepository {
     final response = await _dio.get<List<dynamic>>('/proposals');
     return response.data!
         .map(
-          (item) => EnergyProposalSummary.fromJson(
-            item as Map<String, dynamic>,
-          ),
+          (item) =>
+              EnergyProposalSummary.fromJson(item as Map<String, dynamic>),
         )
         .toList();
   }
@@ -69,13 +66,14 @@ class ApiEnergyRepository implements EnergyRepository {
   }
 
   @override
-  Future<EnergyProposalStatus> updateProposal(
-    String id,
-    String action,
-  ) async {
+  Future<EnergyProposalStatus> updateProposal(String id, String action) async {
     const actions = {'submit', 'approve', 'reject', 'apply'};
     if (!actions.contains(action)) {
-      throw ArgumentError.value(action, 'action', 'Unsupported proposal action');
+      throw ArgumentError.value(
+        action,
+        'action',
+        'Unsupported proposal action',
+      );
     }
     final response = await _dio.post<Map<String, dynamic>>(
       '/proposals/${Uri.encodeComponent(id)}/$action',
@@ -108,10 +106,8 @@ class MockEnergyRepository implements EnergyRepository {
   Future<EnergyProposalDetail> getProposal(String id) async => _notConfigured();
 
   @override
-  Future<EnergyProposalStatus> updateProposal(
-    String id,
-    String action,
-  ) async => _notConfigured();
+  Future<EnergyProposalStatus> updateProposal(String id, String action) async =>
+      _notConfigured();
 }
 
 final energyRepositoryProvider = Provider<EnergyRepository>((ref) {
@@ -144,7 +140,9 @@ class EnergyOptimizerNotifier extends AsyncNotifier<EnergyOptimizationResult?> {
   @override
   Future<EnergyOptimizationResult?> build() async => null;
 
-  Future<EnergyOptimizationResult> run(EnergyOptimizationRequest request) async {
+  Future<EnergyOptimizationResult> run(
+    EnergyOptimizationRequest request,
+  ) async {
     state = const AsyncLoading();
     try {
       final result = await ref.read(energyRepositoryProvider).optimize(request);
@@ -162,7 +160,8 @@ final energyOptimizerProvider =
       EnergyOptimizerNotifier.new,
     );
 
-class EnergyProposalActionNotifier extends AsyncNotifier<EnergyProposalStatus?> {
+class EnergyProposalActionNotifier
+    extends AsyncNotifier<EnergyProposalStatus?> {
   @override
   Future<EnergyProposalStatus?> build() async => null;
 

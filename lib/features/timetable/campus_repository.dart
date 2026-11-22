@@ -22,6 +22,12 @@ class TimetableSession {
     this.rawLabel,
     this.blockId,
     this.version,
+    this.sessionType,
+    this.startTime,
+    this.endTime,
+    this.facultyNames = const [],
+    this.roomRealLabel,
+    this.roomInferred,
   });
 
   factory TimetableSession.fromJson(Map<String, dynamic> json) =>
@@ -41,6 +47,14 @@ class TimetableSession {
         rawLabel: json['raw_label'] as String?,
         blockId: json['block_id'] as String?,
         version: json['version'] as int?,
+        sessionType: json['session_type'] as String?,
+        startTime: json['start_time'] as String?,
+        endTime: json['end_time'] as String?,
+        facultyNames: (json['faculty_names'] as List<dynamic>? ?? const [])
+            .map((item) => item.toString())
+            .toList(),
+        roomRealLabel: json['room_real_label'] as String?,
+        roomInferred: json['room_inferred'] as bool?,
       );
 
   final int id;
@@ -58,6 +72,12 @@ class TimetableSession {
   final String? rawLabel;
   final String? blockId;
   final int? version;
+  final String? sessionType;
+  final String? startTime;
+  final String? endTime;
+  final List<String> facultyNames;
+  final String? roomRealLabel;
+  final bool? roomInferred;
 }
 
 class StudentTimetable {
@@ -213,6 +233,80 @@ class AvailableRoom {
   final int? capacity;
 }
 
+class MetaPeriod {
+  const MetaPeriod({
+    required this.period,
+    required this.start,
+    required this.end,
+  });
+
+  factory MetaPeriod.fromJson(Map<String, dynamic> json) => MetaPeriod(
+    period: json['period'] as int,
+    start: json['start'] as String,
+    end: json['end'] as String,
+  );
+
+  final int period;
+  final String start;
+  final String end;
+}
+
+class PeriodBreak {
+  const PeriodBreak({
+    required this.afterPeriod,
+    required this.label,
+    required this.start,
+    required this.end,
+  });
+
+  factory PeriodBreak.fromJson(Map<String, dynamic> json) => PeriodBreak(
+    afterPeriod: json['after_period'] as int,
+    label: json['label'] as String,
+    start: json['start'] as String,
+    end: json['end'] as String,
+  );
+
+  final int afterPeriod;
+  final String label;
+  final String start;
+  final String end;
+}
+
+class TimetableMeta {
+  const TimetableMeta({required this.periods, required this.breaks});
+
+  factory TimetableMeta.fromJson(Map<String, dynamic> json) => TimetableMeta(
+    periods: (json['periods'] as List<dynamic>)
+        .map((item) => MetaPeriod.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    breaks: (json['breaks'] as List<dynamic>)
+        .map((item) => PeriodBreak.fromJson(item as Map<String, dynamic>))
+        .toList(),
+  );
+
+  final List<MetaPeriod> periods;
+  final List<PeriodBreak> breaks;
+}
+
+class CalendarHoliday {
+  const CalendarHoliday({
+    required this.date,
+    required this.name,
+    required this.source,
+  });
+
+  factory CalendarHoliday.fromJson(Map<String, dynamic> json) =>
+      CalendarHoliday(
+        date: json['date'] as String,
+        name: json['name'] as String,
+        source: json['source'] as String,
+      );
+
+  final String date;
+  final String name;
+  final String source;
+}
+
 class TimetableFailure implements Exception {
   const TimetableFailure(this.statusCode, this.message);
 
@@ -233,13 +327,16 @@ class TimetableFailure implements Exception {
           ? responseData['detail']
           : null;
       final message = switch (detail) {
-        List<dynamic> values => values
-            .map((item) {
-              if (item is Map<String, dynamic>) return item['msg']?.toString();
-              return item.toString();
-            })
-            .whereType<String>()
-            .join('; '),
+        List<dynamic> values =>
+          values
+              .map((item) {
+                if (item is Map<String, dynamic>) {
+                  return item['msg']?.toString();
+                }
+                return item.toString();
+              })
+              .whereType<String>()
+              .join('; '),
         null => null,
         _ => detail.toString(),
       };
@@ -260,6 +357,8 @@ abstract interface class CampusRepository {
     required String day,
     required int period,
   });
+  Future<TimetableMeta> getTimetableMeta();
+  Future<List<CalendarHoliday>> getCalendarHolidays();
 }
 
 class ApiCampusRepository implements CampusRepository {
@@ -332,6 +431,20 @@ class ApiCampusRepository implements CampusRepository {
       );
     }).toList();
   }
+
+  @override
+  Future<TimetableMeta> getTimetableMeta() async {
+    final response = await api.dio.get<Map<String, dynamic>>('/meta/periods');
+    return TimetableMeta.fromJson(response.data!);
+  }
+
+  @override
+  Future<List<CalendarHoliday>> getCalendarHolidays() async {
+    final response = await api.dio.get<List<dynamic>>('/calendar/holidays');
+    return response.data!
+        .map((item) => CalendarHoliday.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 class MockCampusRepository implements CampusRepository {
@@ -359,6 +472,13 @@ class MockCampusRepository implements CampusRepository {
     required String day,
     required int period,
   }) async => [];
+
+  @override
+  Future<TimetableMeta> getTimetableMeta() async =>
+      const TimetableMeta(periods: [], breaks: []);
+
+  @override
+  Future<List<CalendarHoliday>> getCalendarHolidays() async => const [];
 }
 
 final campusRepositoryProvider = Provider<CampusRepository>((ref) {
@@ -392,3 +512,13 @@ final roomAvailabilityProvider =
           .getAvailableRooms(day: query.day, period: query.period),
       retry: (_, _) => null,
     );
+
+final timetableMetaProvider = FutureProvider<TimetableMeta>(
+  (ref) => ref.watch(campusRepositoryProvider).getTimetableMeta(),
+  retry: (_, _) => null,
+);
+
+final calendarHolidaysProvider = FutureProvider<List<CalendarHoliday>>(
+  (ref) => ref.watch(campusRepositoryProvider).getCalendarHolidays(),
+  retry: (_, _) => null,
+);

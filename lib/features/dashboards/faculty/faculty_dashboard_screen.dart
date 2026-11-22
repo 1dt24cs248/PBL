@@ -10,28 +10,30 @@ class FacultyDashboardScreen extends StatelessWidget {
     title: 'Faculty Dashboard',
     destinations: [
       DashboardDestination(
-        title: 'Faculty Timetable',
+        title: 'Time Table',
         subtitle: 'View your teaching schedule',
         route: '/faculty/timetable',
         icon: Icons.calendar_month_outlined,
       ),
       DashboardDestination(
-        title: 'Room Availability Finder',
-        subtitle: 'Find available rooms',
+        title: 'Room Finder',
         route: '/rooms/availability',
         icon: Icons.meeting_room_outlined,
       ),
       DashboardDestination(
         title: 'Campus Map',
-        subtitle: 'View room layouts and occupancy',
         route: '/campus-map',
         icon: Icons.map_outlined,
       ),
       DashboardDestination(
         title: 'Route Navigator',
-        subtitle: 'Find a route between rooms',
         route: '/route-navigator',
         icon: Icons.alt_route,
+      ),
+      DashboardDestination(
+        title: 'Notifications',
+        route: '/notifications',
+        icon: Icons.notifications_outlined,
       ),
     ],
   );

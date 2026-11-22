@@ -1,91 +1,66 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../authentication/authentication_screen.dart';
+import '../../../shared/widgets/dashboard_menu.dart';
 
-class StudentDashboardScreen extends ConsumerWidget {
+class StudentDashboardScreen extends StatelessWidget {
   const StudentDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider);
-    final user = auth.value;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Dashboard'),
-        actions: [
-          IconButton(
-            tooltip: 'Logout',
-            onPressed: () => ref.read(authProvider.notifier).logout(),
-            icon: const Icon(Icons.logout),
-          ),
-        ],
+  Widget build(BuildContext context) => const DashboardMenu(
+    title: 'Student Dashboard',
+    showStudentMetadata: true,
+    destinations: [
+      DashboardDestination(
+        title: 'Time Table',
+        subtitle: "Today's timetable",
+        route: '/student/timetable',
+        icon: Icons.calendar_month_outlined,
       ),
-      body: user == null
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.fullName,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text('Category: ${user.category}'),
-                        Text('Role: ${user.role}'),
-                        if (user.department.isNotEmpty)
-                          Text('Department: ${user.department}'),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.today_outlined),
-                    title: const Text("Today's timetable"),
-                    subtitle: const Text('View student timetable'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go('/student/timetable'),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.meeting_room_outlined),
-                    title: const Text('Room Availability Finder'),
-                    subtitle: const Text('Find available rooms'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go('/rooms/availability'),
-                  ),
-                ),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.map_outlined),
-                    title: const Text('Campus Map'),
-                    subtitle: const Text('View room layouts and occupancy'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go('/campus-map'),
-                  ),
-                ),
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.alt_route),
-                    title: const Text('Route Navigator'),
-                    subtitle: const Text('Find a route between rooms'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go('/route-navigator'),
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
+      DashboardDestination(
+        title: 'Academic Calendar',
+        route: '/student/calendar',
+        icon: Icons.event_note_outlined,
+      ),
+      DashboardDestination(
+        title: 'Attendance',
+        route: '/student/attendance',
+        icon: Icons.fact_check_outlined,
+      ),
+      DashboardDestination(
+        title: 'LMS',
+        route: '/student/lms',
+        icon: Icons.menu_book_outlined,
+      ),
+      DashboardDestination(
+        title: 'Fees',
+        route: '/student/fees',
+        icon: Icons.receipt_long_outlined,
+      ),
+      DashboardDestination(
+        title: 'Profile',
+        route: '/student/profile',
+        icon: Icons.person_outline,
+      ),
+      DashboardDestination(
+        title: 'Campus Map',
+        route: '/campus-map',
+        icon: Icons.map_outlined,
+      ),
+      DashboardDestination(
+        title: 'Route Navigator',
+        route: '/route-navigator',
+        icon: Icons.alt_route,
+      ),
+      DashboardDestination(
+        title: 'Room Finder',
+        route: '/rooms/availability',
+        icon: Icons.meeting_room_outlined,
+      ),
+      DashboardDestination(
+        title: 'Notifications',
+        route: '/notifications',
+        icon: Icons.notifications_outlined,
+      ),
+    ],
+  );
 }

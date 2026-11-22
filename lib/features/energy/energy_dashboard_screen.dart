@@ -133,9 +133,7 @@ class _BaselineReport extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        '${floor.kwhWeek?.toStringAsFixed(2) ?? '—'} kWh',
-                      ),
+                      Text('${floor.kwhWeek?.toStringAsFixed(2) ?? '—'} kWh'),
                     ],
                   ),
                   Padding(
@@ -222,7 +220,8 @@ class _UtilizationReport extends StatelessWidget {
         Wrap(
           spacing: 8,
           children: [
-            for (final room in utilization.roomsNeverUsed) Chip(label: Text(room)),
+            for (final room in utilization.roomsNeverUsed)
+              Chip(label: Text(room)),
           ],
         ),
       const SizedBox(height: 12),

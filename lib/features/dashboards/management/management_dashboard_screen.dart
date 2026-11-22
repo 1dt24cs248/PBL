@@ -13,31 +13,39 @@ class ManagementDashboardScreen extends ConsumerWidget {
     return DashboardMenu(
       title: 'Management Dashboard',
       destinations: [
+        if (isAdmin)
+          const DashboardDestination(
+            title: 'Energy',
+            route: '/energy',
+            icon: Icons.bolt_outlined,
+          ),
+        if (isAdmin)
+          const DashboardDestination(
+            title: 'Optimizer',
+            route: '/energy/optimizer',
+            icon: Icons.tune_outlined,
+          ),
+        if (isAdmin)
+          const DashboardDestination(
+            title: 'Proposals',
+            route: '/proposals',
+            icon: Icons.fact_check_outlined,
+          ),
         const DashboardDestination(
-          title: 'Room Availability Finder',
-          subtitle: 'Find available rooms',
+          title: 'Room Finder',
           route: '/rooms/availability',
           icon: Icons.meeting_room_outlined,
         ),
         const DashboardDestination(
           title: 'Campus Map',
-          subtitle: 'View room layouts and occupancy',
           route: '/campus-map',
           icon: Icons.map_outlined,
         ),
         const DashboardDestination(
           title: 'Route Navigator',
-          subtitle: 'Find a route between rooms',
           route: '/route-navigator',
           icon: Icons.alt_route,
         ),
-        if (isAdmin)
-          const DashboardDestination(
-            title: 'Energy & Optimization',
-            subtitle: 'Review energy use and proposals',
-            route: '/energy',
-            icon: Icons.bolt_outlined,
-          ),
       ],
     );
   }
