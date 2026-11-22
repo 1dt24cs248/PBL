@@ -48,9 +48,8 @@ class CampusFloorIndex {
         canvas: CampusCanvas.fromJson(json['canvas'] as Map<String, dynamic>),
         floors: (json['floors'] as List<dynamic>)
             .map(
-              (item) => CampusFloorSummary.fromJson(
-                item as Map<String, dynamic>,
-              ),
+              (item) =>
+                  CampusFloorSummary.fromJson(item as Map<String, dynamic>),
             )
             .toList(),
       );
@@ -121,10 +120,7 @@ class CampusNavNode {
 }
 
 class CampusRoomOccupancy {
-  const CampusRoomOccupancy({
-    required this.occupied,
-    required this.sessions,
-  });
+  const CampusRoomOccupancy({required this.occupied, required this.sessions});
 
   factory CampusRoomOccupancy.fromJson(Map<String, dynamic> json) =>
       CampusRoomOccupancy(
@@ -202,14 +198,11 @@ class CampusFloorPlan {
             .map((item) => CampusCore.fromJson(item as Map<String, dynamic>))
             .toList(),
         navNodes: (json['nav_nodes'] as List<dynamic>? ?? [])
-            .map(
-              (item) => CampusNavNode.fromJson(item as Map<String, dynamic>),
-            )
+            .map((item) => CampusNavNode.fromJson(item as Map<String, dynamic>))
             .toList(),
         rooms: (json['rooms'] as List<dynamic>)
             .map(
-              (item) =>
-                  CampusFloorRoom.fromJson(item as Map<String, dynamic>),
+              (item) => CampusFloorRoom.fromJson(item as Map<String, dynamic>),
             )
             .toList(),
       );
@@ -364,6 +357,8 @@ class CampusRoute {
     required this.path,
     required this.steps,
     required this.floorsVisited,
+    this.instructions = const [],
+    this.summary,
   });
 
   factory CampusRoute.fromJson(Map<String, dynamic> json) => CampusRoute(
@@ -384,6 +379,15 @@ class CampusRoute {
         .map((item) => CampusRouteStep.fromJson(item as Map<String, dynamic>))
         .toList(),
     floorsVisited: (json['floors_visited'] as List<dynamic>).cast<int>(),
+    instructions: (json['instructions'] as List<dynamic>? ?? const [])
+        .map(
+          (item) =>
+              CampusRouteInstruction.fromJson(item as Map<String, dynamic>),
+        )
+        .toList(),
+    summary: json['summary'] == null
+        ? null
+        : CampusRouteSummary.fromJson(json['summary'] as Map<String, dynamic>),
   );
 
   final String fromRoom;
@@ -397,4 +401,94 @@ class CampusRoute {
   final List<CampusRouteNode> path;
   final List<CampusRouteStep> steps;
   final List<int> floorsVisited;
+  final List<CampusRouteInstruction> instructions;
+  final CampusRouteSummary? summary;
+}
+
+class CampusRouteInstruction {
+  const CampusRouteInstruction({
+    required this.index,
+    required this.kind,
+    required this.text,
+    required this.floor,
+    required this.toFloor,
+    required this.distanceMetres,
+    required this.pathFromIndex,
+    required this.pathToIndex,
+  });
+
+  factory CampusRouteInstruction.fromJson(Map<String, dynamic> json) =>
+      CampusRouteInstruction(
+        index: json['index'] as int,
+        kind: json['kind'] as String,
+        text: json['text'] as String,
+        floor: json['floor'] as int,
+        toFloor: json['to_floor'] as int?,
+        distanceMetres: (json['distance_m'] as num).toDouble(),
+        pathFromIndex: json['path_from_index'] as int,
+        pathToIndex: json['path_to_index'] as int,
+      );
+
+  final int index;
+  final String kind;
+  final String text;
+  final int floor;
+  final int? toFloor;
+  final double distanceMetres;
+  final int pathFromIndex;
+  final int pathToIndex;
+}
+
+class CampusRouteSummary {
+  const CampusRouteSummary({
+    required this.distanceMetres,
+    required this.estSeconds,
+    required this.estMinutes,
+    required this.floorsTraversed,
+    required this.floorsChanged,
+    required this.mode,
+    required this.start,
+    required this.end,
+  });
+
+  factory CampusRouteSummary.fromJson(
+    Map<String, dynamic> json,
+  ) => CampusRouteSummary(
+    distanceMetres: (json['distance_m'] as num).toDouble(),
+    estSeconds: (json['est_seconds'] as num).toDouble(),
+    estMinutes: json['est_minutes'] as int,
+    floorsTraversed: (json['floors_traversed'] as List<dynamic>).cast<int>(),
+    floorsChanged: json['floors_changed'] as int,
+    mode: json['mode'] as String,
+    start: CampusRouteEndpoint.fromJson(json['start'] as Map<String, dynamic>),
+    end: CampusRouteEndpoint.fromJson(json['end'] as Map<String, dynamic>),
+  );
+
+  final double distanceMetres;
+  final double estSeconds;
+  final int estMinutes;
+  final List<int> floorsTraversed;
+  final int floorsChanged;
+  final String mode;
+  final CampusRouteEndpoint start;
+  final CampusRouteEndpoint end;
+}
+
+class CampusRouteEndpoint {
+  const CampusRouteEndpoint({
+    required this.code,
+    required this.realLabel,
+    required this.floor,
+  });
+
+  factory CampusRouteEndpoint.fromJson(Map<String, dynamic> json) =>
+      CampusRouteEndpoint(
+        code: json['code'] as String,
+        realLabel: json['real_label'] as String,
+        floor: json['floor'] as int,
+      );
+
+  final String code;
+  final String realLabel;
+  final int floor;
 }

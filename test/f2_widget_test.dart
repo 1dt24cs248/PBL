@@ -52,6 +52,13 @@ class FakeCampusRepository implements CampusRepository {
     requestedRoomQueries.add((day: day, period: period));
     return roomsResult?.call(day, period) ?? Future.value([]);
   }
+
+  @override
+  Future<TimetableMeta> getTimetableMeta() async =>
+      const TimetableMeta(periods: [], breaks: []);
+
+  @override
+  Future<List<CalendarHoliday>> getCalendarHolidays() async => const [];
 }
 
 const _emptyStudentTimetable = StudentTimetable(
@@ -64,6 +71,54 @@ const _emptyStudentTimetable = StudentTimetable(
 );
 
 void main() {
+  testWidgets('timetable lab card shows times, lab badge and inferred room', (
+    tester,
+  ) async {
+    final repository = FakeCampusRepository(
+      studentResult: () async => StudentTimetable(
+        usn: '1DT24CS248',
+        termCode: '2026-27-ODD',
+        divisionCode: 'CSE-5',
+        sectionCode: 'E',
+        labBatch: 'A1',
+        sessions: [
+          TimetableSession(
+            id: 501,
+            day: 'Mon',
+            periods: [3, 4],
+            subjectCode: 'BCS508',
+            subjectName: 'Lab Subject',
+            provenance: 'REAL_DSATM_PDF',
+            facultyNames: ['Test Faculty'],
+            roomId: 'A-F2-02',
+            roomRealLabel: 'Classroom 02',
+            roomInferred: true,
+            roomRequired: true,
+            blockId: 'lab-block',
+            sessionType: 'Lab',
+            startTime: '11:35',
+            endTime: '13:25',
+          ),
+        ],
+      ),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [campusRepositoryProvider.overrideWithValue(repository)],
+        child: MaterialApp(
+          home: TimetableScreen(initialDate: DateTime(2026, 11, 23)),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lab'), findsOneWidget);
+    expect(find.text('11:35 AM to 1:25 PM'), findsOneWidget);
+    expect(find.text('Room Classroom 02 (A-F2-02)'), findsOneWidget);
+    expect(find.text('Inferred'), findsOneWidget);
+  });
+
   testWidgets('student timetable shows holiday returned for selected date', (
     tester,
   ) async {
@@ -86,7 +141,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Deepavali'), findsOneWidget);
+    expect(find.text('Deepavali 2026'), findsOneWidget);
     expect(repository.requestedDates, ['2026-11-10']);
   });
 

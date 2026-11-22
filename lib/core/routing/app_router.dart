@@ -21,7 +21,7 @@ import '../../features/rooms/room_availability_screen.dart';
 import '../../features/room_management/room_management_screen.dart';
 import '../../features/timetable/timetable_screen.dart';
 import '../../features/what_if_simulator/what_if_simulator_screen.dart';
-import '../../shared/widgets/empty_state.dart';
+import '../../features/student_erp/student_erp_screens.dart';
 
 String roleDashboardRoute(String role) => switch (role) {
   'student' => '/student',
@@ -76,34 +76,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/student/calendar',
-        builder: (context, state) => const EmptyState(
-          title: 'Academic Calendar',
-          message: 'Coming in this build.',
-        ),
+        builder: (context, state) => const AcademicCalendarScreen(),
       ),
       GoRoute(
         path: '/student/attendance',
-        builder: (context, state) => const EmptyState(
-          title: 'Attendance',
-          message: 'Coming in this build.',
-        ),
+        builder: (context, state) => const AttendanceScreen(),
       ),
       GoRoute(
         path: '/student/lms',
-        builder: (context, state) =>
-            const EmptyState(title: 'LMS', message: 'Coming in this build.'),
+        builder: (context, state) => const LmsScreen(),
       ),
       GoRoute(
         path: '/student/fees',
-        builder: (context, state) =>
-            const EmptyState(title: 'Fees', message: 'Coming in this build.'),
+        builder: (context, state) => const StudentFeesScreen(),
       ),
       GoRoute(
         path: '/student/profile',
-        builder: (context, state) => const EmptyState(
-          title: 'Profile',
-          message: 'Coming in this build.',
-        ),
+        builder: (context, state) => const StudentProfileScreen(),
       ),
       GoRoute(
         path: '/faculty/timetable',

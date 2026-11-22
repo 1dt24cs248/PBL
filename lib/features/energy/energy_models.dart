@@ -87,27 +87,18 @@ class EnergyOccupancyReport {
     required this.recordedRoomClashes,
   });
 
-  factory EnergyOccupancyReport.fromJson(Map<String, dynamic> json) =>
-      EnergyOccupancyReport(
-        rooms: (json['rooms'] as List<dynamic>)
-            .map(
-              (item) => EnergyRoomUsage.fromJson(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList(),
-        floors: (json['floors'] as List<dynamic>)
-            .map(
-              (item) => EnergyFloorUsage.fromJson(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList(),
-        block: EnergyBlockUsage.fromJson(
-          json['block'] as Map<String, dynamic>,
-        ),
-        recordedRoomClashes: json['recorded_room_clashes'] as int,
-      );
+  factory EnergyOccupancyReport.fromJson(
+    Map<String, dynamic> json,
+  ) => EnergyOccupancyReport(
+    rooms: (json['rooms'] as List<dynamic>)
+        .map((item) => EnergyRoomUsage.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    floors: (json['floors'] as List<dynamic>)
+        .map((item) => EnergyFloorUsage.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    block: EnergyBlockUsage.fromJson(json['block'] as Map<String, dynamic>),
+    recordedRoomClashes: json['recorded_room_clashes'] as int,
+  );
 
   final List<EnergyRoomUsage> rooms;
   final List<EnergyFloorUsage> floors;
@@ -123,27 +114,18 @@ class EnergyFlatBaseline {
     required this.block,
   });
 
-  factory EnergyFlatBaseline.fromJson(Map<String, dynamic> json) =>
-      EnergyFlatBaseline(
-        label: json['label'] as String,
-        rooms: (json['rooms'] as List<dynamic>)
-            .map(
-              (item) => EnergyRoomUsage.fromJson(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList(),
-        floors: (json['floors'] as List<dynamic>)
-            .map(
-              (item) => EnergyFloorUsage.fromJson(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList(),
-        block: EnergyBlockUsage.fromJson(
-          json['block'] as Map<String, dynamic>,
-        ),
-      );
+  factory EnergyFlatBaseline.fromJson(
+    Map<String, dynamic> json,
+  ) => EnergyFlatBaseline(
+    label: json['label'] as String,
+    rooms: (json['rooms'] as List<dynamic>)
+        .map((item) => EnergyRoomUsage.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    floors: (json['floors'] as List<dynamic>)
+        .map((item) => EnergyFloorUsage.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    block: EnergyBlockUsage.fromJson(json['block'] as Map<String, dynamic>),
+  );
 
   final String label;
   final List<EnergyRoomUsage> rooms;
@@ -161,19 +143,18 @@ class EnergyBaseline {
     required this.flatBaseline,
   });
 
-  factory EnergyBaseline.fromJson(Map<String, dynamic> json) =>
-      EnergyBaseline(
-        termCode: json['term_code'] as String,
-        periodHours: (json['period_hours'] as num).toDouble(),
-        tariffInrPerKwh: (json['tariff_inr_per_kwh'] as num).toDouble(),
-        dataStatus: json['data_status'] as String,
-        timetableOccupancy: EnergyOccupancyReport.fromJson(
-          json['timetable_occupancy'] as Map<String, dynamic>,
-        ),
-        flatBaseline: EnergyFlatBaseline.fromJson(
-          json['flat_spec_baseline_6h_x_5days'] as Map<String, dynamic>,
-        ),
-      );
+  factory EnergyBaseline.fromJson(Map<String, dynamic> json) => EnergyBaseline(
+    termCode: json['term_code'] as String,
+    periodHours: (json['period_hours'] as num).toDouble(),
+    tariffInrPerKwh: (json['tariff_inr_per_kwh'] as num).toDouble(),
+    dataStatus: json['data_status'] as String,
+    timetableOccupancy: EnergyOccupancyReport.fromJson(
+      json['timetable_occupancy'] as Map<String, dynamic>,
+    ),
+    flatBaseline: EnergyFlatBaseline.fromJson(
+      json['flat_spec_baseline_6h_x_5days'] as Map<String, dynamic>,
+    ),
+  );
 
   final String termCode;
   final double periodHours;
@@ -210,30 +191,25 @@ class EnergyUtilization {
     required this.roomsUnder50PercentSeatUtilization,
   });
 
-  factory EnergyUtilization.fromJson(Map<String, dynamic> json) =>
-      EnergyUtilization(
-        termCode: json['term_code'] as String,
-        periodsPerDay: json['periods_per_day'] as int,
-        daysPerWeek: json['days_per_week'] as int,
-        dataStatus: json['data_status'] as String,
-        rooms: (json['rooms'] as List<dynamic>)
+  factory EnergyUtilization.fromJson(
+    Map<String, dynamic> json,
+  ) => EnergyUtilization(
+    termCode: json['term_code'] as String,
+    periodsPerDay: json['periods_per_day'] as int,
+    daysPerWeek: json['days_per_week'] as int,
+    dataStatus: json['data_status'] as String,
+    rooms: (json['rooms'] as List<dynamic>)
+        .map((item) => EnergyRoomUsage.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    roomsNeverUsed: (json['rooms_never_used'] as List<dynamic>).cast<String>(),
+    roomsUnder50PercentSeatUtilization:
+        (json['rooms_under_50_percent_seat_utilization'] as List<dynamic>)
             .map(
-              (item) => EnergyRoomUsage.fromJson(
-                item as Map<String, dynamic>,
-              ),
+              (item) =>
+                  EnergyLowSeatRoom.fromJson(item as Map<String, dynamic>),
             )
             .toList(),
-        roomsNeverUsed: (json['rooms_never_used'] as List<dynamic>)
-            .cast<String>(),
-        roomsUnder50PercentSeatUtilization:
-            (json['rooms_under_50_percent_seat_utilization'] as List<dynamic>)
-                .map(
-                  (item) => EnergyLowSeatRoom.fromJson(
-                    item as Map<String, dynamic>,
-                  ),
-                )
-                .toList(),
-      );
+  );
 
   final String termCode;
   final int periodsPerDay;
@@ -333,31 +309,24 @@ class EnergyOptimizationResult {
     this.infeasibleReason,
   });
 
-  factory EnergyOptimizationResult.fromJson(Map<String, dynamic> json) =>
-      EnergyOptimizationResult(
-        id: json['id'] as String,
-        status: json['status'] as String,
-        termCode: json['term_code'] as String,
-        solverStatus: json['solver_status'] as String,
-        solveTimeSeconds: (json['solve_time_s'] as num).toDouble(),
-        before: OptimizationTotals.fromJson(
-          json['before'] as Map<String, dynamic>,
-        ),
-        after: OptimizationTotals.fromJson(
-          json['after'] as Map<String, dynamic>,
-        ),
-        relocations: json['relocations'] as int,
-        affectedStudents: json['affected_students'] as int,
-        changes: (json['changes'] as List<dynamic>)
-            .map(
-              (item) => EnergyChange.fromJson(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList(),
-        dataStatus: json['data_status'] as String,
-        infeasibleReason: json['infeasible_reason'] as String?,
-      );
+  factory EnergyOptimizationResult.fromJson(
+    Map<String, dynamic> json,
+  ) => EnergyOptimizationResult(
+    id: json['id'] as String,
+    status: json['status'] as String,
+    termCode: json['term_code'] as String,
+    solverStatus: json['solver_status'] as String,
+    solveTimeSeconds: (json['solve_time_s'] as num).toDouble(),
+    before: OptimizationTotals.fromJson(json['before'] as Map<String, dynamic>),
+    after: OptimizationTotals.fromJson(json['after'] as Map<String, dynamic>),
+    relocations: json['relocations'] as int,
+    affectedStudents: json['affected_students'] as int,
+    changes: (json['changes'] as List<dynamic>)
+        .map((item) => EnergyChange.fromJson(item as Map<String, dynamic>))
+        .toList(),
+    dataStatus: json['data_status'] as String,
+    infeasibleReason: json['infeasible_reason'] as String?,
+  );
 
   final String id;
   final String status;
@@ -399,10 +368,7 @@ class EnergyProposalSummary {
 }
 
 class EnergyProposalDetail {
-  const EnergyProposalDetail({
-    required this.result,
-    required this.status,
-  });
+  const EnergyProposalDetail({required this.result, required this.status});
 
   factory EnergyProposalDetail.fromJson(Map<String, dynamic> json) =>
       EnergyProposalDetail(

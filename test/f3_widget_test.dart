@@ -7,6 +7,7 @@ import 'package:pbl/features/campus_map/campus_map_painters.dart';
 import 'package:pbl/features/campus_map/campus_map_repository.dart';
 import 'package:pbl/features/campus_map/campus_map_screen.dart';
 import 'package:pbl/features/timetable/campus_repository.dart';
+import 'package:pbl/features/campus_map/isometric_transform.dart';
 
 class _FakeCampusMapRepository implements CampusMapRepository {
   int? lastFloor;
@@ -260,6 +261,58 @@ DioException _badRequest() {
 }
 
 void main() {
+  test('route instruction and summary models parse clean API fields', () {
+    final route = CampusRoute.fromJson({
+      'from_room': 'A-G06',
+      'to_room': 'A-F5-05',
+      'mode': 'accessible',
+      'node_keys': <String>[],
+      'edges': <dynamic>[],
+      'distance_m': 94,
+      'route_cost_seconds': 178.3335,
+      'provenance': 'SYNTHETIC',
+      'path': <dynamic>[],
+      'steps': <dynamic>[],
+      'floors_visited': [0, 5],
+      'instructions': [
+        {
+          'index': 0,
+          'kind': 'start',
+          'text': 'Leave Staff Room 06 (A-G06)',
+          'floor': 0,
+          'to_floor': null,
+          'distance_m': 0,
+          'path_from_index': 0,
+          'path_to_index': 0,
+        },
+      ],
+      'summary': {
+        'distance_m': 94,
+        'est_seconds': 178.3335,
+        'est_minutes': 3,
+        'floors_traversed': [0, 1, 2, 3, 4, 5],
+        'floors_changed': 5,
+        'mode': 'accessible',
+        'start': {'code': 'A-G06', 'real_label': 'Staff Room 06', 'floor': 0},
+        'end': {'code': 'A-F5-05', 'real_label': 'Computer Lab 05', 'floor': 5},
+      },
+    });
+
+    expect(route.instructions.single.text, 'Leave Staff Room 06 (A-G06)');
+    expect(route.summary?.estMinutes, 3);
+    expect(route.summary?.floorsChanged, 5);
+  });
+
+  test('isometric transform round trips plan points', () {
+    const transform = IsometricTransform();
+    const planPoint = Offset(300, 180);
+    final screenPoint = transform.toScreen(planPoint, floor: 3);
+    final roundTrip = transform.toPlan(screenPoint, floor: 3);
+
+    expect(roundTrip.dx, closeTo(planPoint.dx, 0.001));
+    expect(roundTrip.dy, closeTo(planPoint.dy, 0.001));
+  });
+
   testWidgets('map tap hit-tests a room rectangle', (tester) async {
     CampusFloorRoom? selected;
     await tester.pumpWidget(
@@ -348,6 +401,24 @@ void main() {
     expect(repository.lastDay, 'Mon');
     expect(repository.lastPeriod, 1);
     expect(find.text('Basement'), findsOneWidget);
+  });
+
+  testWidgets('2.5D toggle falls back to the flat map', (tester) async {
+    final repository = _FakeCampusMapRepository();
+    await tester.pumpWidget(_mapHarness(const CampusMapScreen(), repository));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('campus_floor_canvas')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('campus_25d_toggle')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('campus_isometric_canvas')), findsOneWidget);
+    expect(find.byKey(const Key('reduce_effects_toggle')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('campus_25d_toggle')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('campus_floor_canvas')), findsOneWidget);
   });
 
   testWidgets('route screen explains 404 and 422 and retries network errors', (

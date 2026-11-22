@@ -3,17 +3,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../shared/widgets/api_error_view.dart';
+import '../../features/authentication/authentication_screen.dart';
+import '../energy/energy_repository.dart';
 import 'campus_map_models.dart';
 import 'campus_map_painters.dart';
 import 'campus_map_repository.dart';
 
-class CampusMapScreen extends ConsumerWidget {
+class CampusMapScreen extends ConsumerStatefulWidget {
   const CampusMapScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CampusMapScreen> createState() => _CampusMapScreenState();
+}
+
+class _CampusMapScreenState extends ConsumerState<CampusMapScreen> {
+  bool _isometric = false;
+  bool _reduceEffects = false;
+  bool _energyOverlay = false;
+
+  @override
+  Widget build(BuildContext context) {
     final floorIndex = ref.watch(campusFloorIndexProvider);
     final selection = ref.watch(campusMapSelectionProvider);
+    final role = ref.watch(authProvider).value?.role;
+    final canViewEnergy = role == 'admin' || role == 'hod';
+    final baseline = _energyOverlay && canViewEnergy
+        ? ref.watch(energyBaselineProvider)
+        : null;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Campus Map'),
@@ -32,6 +48,50 @@ class CampusMapScreen extends ConsumerWidget {
           Text(
             'Schematic layout (synthetic)',
             style: Theme.of(context).textTheme.titleMedium,
+          ),
+          if (_energyOverlay)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Text('Modelled on synthetic wattage and tariff'),
+            ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Switch(
+                key: const Key('campus_25d_toggle'),
+                value: _isometric,
+                onChanged: (value) => setState(() => _isometric = value),
+              ),
+              const Text('2.5D view'),
+              if (_isometric)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Switch(
+                      key: const Key('reduce_effects_toggle'),
+                      value: _reduceEffects,
+                      onChanged: (value) =>
+                          setState(() => _reduceEffects = value),
+                    ),
+                    const Text('Reduce effects'),
+                  ],
+                ),
+              if (_isometric && canViewEnergy)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Switch(
+                      key: const Key('energy_overlay_toggle'),
+                      value: _energyOverlay,
+                      onChanged: (value) =>
+                          setState(() => _energyOverlay = value),
+                    ),
+                    const Text('Energy overlay'),
+                  ],
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           floorIndex.when(
@@ -140,19 +200,28 @@ class CampusMapScreen extends ConsumerWidget {
                             child: Text('Holiday: ${plan.holiday}'),
                           ),
                         const SizedBox(height: 8),
-                        CampusFloorMapView(
-                          plan: plan,
-                          onRoomTap: (room) => showModalBottomSheet<void>(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (context) => CampusRoomDetailSheet(
-                              room: room,
-                              floor: plan.floor,
-                              weekday: plan.weekday ?? selection.day,
-                              period: selection.period,
-                            ),
+                        if (_isometric)
+                          CampusIsometricMapView(
+                            plan: plan,
+                            energyByRoom: baseline?.value == null
+                                ? const {}
+                                : {
+                                    for (final room
+                                        in baseline!
+                                            .value!
+                                            .timetableOccupancy
+                                            .rooms)
+                                      room.roomId: room.kwhWeek ?? 0,
+                                  },
+                            onRoomTap: (room) =>
+                                _showRoomDetail(context, plan, room, selection),
+                          )
+                        else
+                          CampusFloorMapView(
+                            plan: plan,
+                            onRoomTap: (room) =>
+                                _showRoomDetail(context, plan, room, selection),
                           ),
-                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'Tap a room for its occupancy and provenance details. '
@@ -166,6 +235,24 @@ class CampusMapScreen extends ConsumerWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  void _showRoomDetail(
+    BuildContext context,
+    CampusFloorPlan plan,
+    CampusFloorRoom room,
+    dynamic selection,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => CampusRoomDetailSheet(
+        room: room,
+        floor: plan.floor,
+        weekday: plan.weekday ?? selection.day,
+        period: selection.period,
       ),
     );
   }
@@ -477,25 +564,45 @@ class _RouteResultView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final floors = route.floorsVisited;
-    final timeSeconds = route.routeCostSeconds.round();
-    final timeLabel = timeSeconds < 60
-        ? '$timeSeconds sec'
-        : '${(timeSeconds / 60).toStringAsFixed(1)} min';
+    final summary = route.summary;
+    final timeLabel = summary == null
+        ? '${(route.routeCostSeconds / 60).ceil()} min'
+        : '${summary.estMinutes} min';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '${route.fromRoom} → ${route.toRoom}',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        Wrap(
-          spacing: 16,
-          children: [
-            Text('Distance: ${route.distanceMetres.toStringAsFixed(1)} m'),
-            Text('Estimated time: $timeLabel'),
-            Chip(label: Text(route.provenance)),
-          ],
+        Card(
+          key: const Key('route_summary_card'),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  summary == null
+                      ? '${route.fromRoom} → ${route.toRoom}'
+                      : '${summary.start.realLabel} (${summary.start.code}) → '
+                            '${summary.end.realLabel} (${summary.end.code})',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    Text(
+                      'Distance: ${summary?.distanceMetres.toStringAsFixed(1) ?? route.distanceMetres.toStringAsFixed(1)} m',
+                    ),
+                    Text('Estimated time: $timeLabel'),
+                    Chip(label: Text(summary?.mode ?? route.mode)),
+                    if (summary != null)
+                      Text('Floors: ${summary.floorsTraversed.join(', ')}'),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
         if (floors.isNotEmpty)
           DefaultTabController(
@@ -521,7 +628,27 @@ class _RouteResultView extends StatelessWidget {
           ),
         const SizedBox(height: 12),
         Text('Route steps', style: Theme.of(context).textTheme.titleMedium),
-        if (route.steps.isEmpty)
+        if (route.instructions.isNotEmpty)
+          for (final instruction in route.instructions)
+            ListTile(
+              key: Key('route_instruction_${instruction.index}'),
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                child: Icon(switch (instruction.kind) {
+                  'start' => Icons.trip_origin,
+                  'walk' => Icons.directions_walk,
+                  'stairs' => Icons.stairs,
+                  'lift' => Icons.elevator,
+                  'arrive' => Icons.location_on,
+                  _ => Icons.route,
+                }),
+              ),
+              title: Text(instruction.text),
+              subtitle: instruction.distanceMetres > 0
+                  ? Text('${instruction.distanceMetres.toStringAsFixed(1)} m')
+                  : null,
+            )
+        else if (route.steps.isEmpty)
           const Text('This route has no walking or floor-transition steps.')
         else
           for (final (index, step) in route.steps.indexed)
